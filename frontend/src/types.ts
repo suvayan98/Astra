@@ -193,10 +193,11 @@ export interface VegetationIntelligenceResult {
 
 export interface MasterPlanZone {
   id: string;
+  code?: string;
   name: string;
-  zone_type: string;
+  zone_type?: string;
   area_acres: number;
-  area_hectares: number;
+  area_hectares?: number;
   area_percentage: number;
   color: string;
   far_ratio: number;
@@ -206,6 +207,10 @@ export interface MasterPlanZone {
     type: string;
     coordinates: number[][][];
   };
+  category?: string;
+  permeable_surface_pct?: number;
+  rooftop_solar_pct?: number;
+  built_up_area_sqft?: number;
 }
 
 export interface MasterPlanAlternative {

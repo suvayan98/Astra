@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Navbar } from './components/Navbar';
+import { TopNav } from './components/TopNav';
+import { Sidebar } from './components/Sidebar';
+import { LandingPage } from './components/LandingPage';
 import { MapWorkspace } from './components/MapWorkspace';
 import { SiteSuitabilityView } from './components/SiteSuitabilityView';
 import { TerrainSoilView } from './components/TerrainSoilView';
@@ -11,6 +13,7 @@ import { MasterPlanDesigner } from './components/MasterPlanDesigner';
 import { FutureSimulationView } from './components/FutureSimulationView';
 import { ISROHubView } from './components/ISROHubView';
 import { TerraAdvisorDrawer } from './components/TerraAdvisorDrawer';
+import { TerraAdvisorPage } from './components/TerraAdvisorPage';
 import { ReportExportModal } from './components/ReportExportModal';
 import { CredentialsModal } from './components/CredentialsModal';
 import { EditZoneModal } from './components/EditZoneModal';
@@ -29,7 +32,8 @@ import {
 
 export const App: React.FC = () => {
   // Navigation
-  const [activeTab, setActiveTab] = useState<string>('master_plan');
+  const [activeTab, setActiveTab] = useState<string>('landing');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
 
   // Planning Parameters
   const [presetSites, setPresetSites] = useState<any[]>([]);
@@ -60,6 +64,13 @@ export const App: React.FC = () => {
   const [isReportOpen, setIsReportOpen] = useState<boolean>(false);
   const [isCredentialsOpen, setIsCredentialsOpen] = useState<boolean>(false);
   const [editingZone, setEditingZone] = useState<MasterPlanZone | null>(null);
+
+  // Responsive sidebar collapse for tablets / mobile
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setIsSidebarCollapsed(true);
+    }
+  }, []);
 
   // 1. Initial Load of Preset Sites
   useEffect(() => {
@@ -201,15 +212,17 @@ export const App: React.FC = () => {
   };
 
   const currentSite = presetSites.find((s) => s.id === selectedSiteId) || {
-    name: 'India Greenfield Site',
+    name: 'Dholera SIR Greenfield',
+    district: 'Ahmedabad',
+    state: 'Gujarat',
     center: { lat: 22.2530, lng: 72.1920 },
     boundary: { type: 'Polygon', coordinates: [] }
   };
 
   return (
-    <div className="min-h-screen bg-[#080d1a] text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-[var(--bg-primary,#07111F)] text-[var(--text-primary,#F1F5F9)] flex flex-col font-sans transition-colors duration-200">
       {/* Top Main Navigation */}
-      <Navbar
+      <TopNav
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         presetSites={presetSites}
@@ -225,95 +238,151 @@ export const App: React.FC = () => {
         onOpenAdvisor={() => setIsAdvisorOpen(true)}
         onOpenReport={() => setIsReportOpen(true)}
         onOpenIsroModal={() => setIsCredentialsOpen(true)}
+        onToggleSidebar={() => setIsSidebarCollapsed((prev) => !prev)}
+        isSidebarCollapsed={isSidebarCollapsed}
       />
 
-      {/* Main Workspace Area */}
-      <main className="flex-1 overflow-x-hidden">
-        {activeTab === 'map' && (
-          <MapWorkspace
-            center={currentSite.center}
-            boundary={customBoundary || currentSite.boundary}
-            activePlan={activePlan}
-            onEditZone={(zone) => setEditingZone(zone)}
-            onBoundaryDrawn={handleBoundaryDrawn}
-            siteName={currentSite.name}
-          />
-        )}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Collapsible 12-Module Sidebar */}
+        <Sidebar
+          activeTab={activeTab}
+          setActiveTab={(tab) => {
+            if (tab === 'reports') {
+              setIsReportOpen(true);
+            } else {
+              setActiveTab(tab);
+            }
+          }}
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          onOpenAdvisor={() => setIsAdvisorOpen(true)}
+          onOpenReport={() => setIsReportOpen(true)}
+          onOpenIsroModal={() => setIsCredentialsOpen(true)}
+          siteName={currentSite.name}
+          areaAcres={areaAcres}
+          population={population}
+        />
 
-        {activeTab === 'suitability' && (
-          <SiteSuitabilityView
-            suitability={suitability}
-            loading={loadingAnalysis}
-          />
-        )}
+        {/* Main Workspace Area */}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden bg-[var(--bg-primary,#07111F)]">
+          {activeTab === 'landing' && (
+            <LandingPage
+              onStartPlanning={() => setActiveTab('master_plan')}
+              onSelectModule={(moduleId) => {
+                if (moduleId === 'reports') {
+                  setIsReportOpen(true);
+                } else {
+                  setActiveTab(moduleId);
+                }
+              }}
+              onOpenIsroModal={() => setIsCredentialsOpen(true)}
+            />
+          )}
 
-        {activeTab === 'terrain_soil' && (
-          <TerrainSoilView
-            terrain={terrain}
-            soil={soil}
-            loading={loadingAnalysis}
-          />
-        )}
+          {activeTab === 'map' && (
+            <MapWorkspace
+              center={currentSite.center}
+              boundary={customBoundary || currentSite.boundary}
+              activePlan={activePlan}
+              onEditZone={(zone) => setEditingZone(zone)}
+              onBoundaryDrawn={handleBoundaryDrawn}
+              siteName={currentSite.name}
+            />
+          )}
 
-        {activeTab === 'water' && (
-          <WaterIntelligenceView
-            water={water}
-            loading={loadingAnalysis}
-          />
-        )}
+          {activeTab === 'suitability' && (
+            <SiteSuitabilityView
+              suitability={suitability}
+              loading={loadingAnalysis}
+            />
+          )}
 
-        {activeTab === 'climate' && (
-          <ClimateDisasterView
-            climate={climate}
-            loading={loadingAnalysis}
-          />
-        )}
+          {activeTab === 'terrain_soil' && (
+            <TerrainSoilView
+              terrain={terrain}
+              soil={soil}
+              loading={loadingAnalysis}
+            />
+          )}
 
-        {activeTab === 'energy' && (
-          <RenewableEnergyView
-            energy={energy}
-            loading={loadingAnalysis}
-          />
-        )}
+          {activeTab === 'water' && (
+            <WaterIntelligenceView
+              water={water}
+              loading={loadingAnalysis}
+            />
+          )}
 
-        {activeTab === 'vegetation' && (
-          <VegetationView
-            vegetation={vegetation}
-            loading={loadingAnalysis}
-          />
-        )}
+          {activeTab === 'climate' && (
+            <ClimateDisasterView
+              climate={climate}
+              loading={loadingAnalysis}
+            />
+          )}
 
-        {activeTab === 'master_plan' && (
-          <MasterPlanDesigner
-            plans={plans}
-            activePlan={activePlan}
-            onSelectPlan={(p) => setActivePlan(p)}
-            onEditZone={(z) => setEditingZone(z)}
-            onRegeneratePlans={handleRegeneratePlans}
-            population={population}
-            areaAcres={areaAcres}
-            loading={loadingPlans}
-          />
-        )}
+          {activeTab === 'energy' && (
+            <RenewableEnergyView
+              energy={energy}
+              loading={loadingAnalysis}
+            />
+          )}
 
-        {activeTab === 'simulation' && (
-          <FutureSimulationView
-            basePopulation={population}
-          />
-        )}
+          {activeTab === 'vegetation' && (
+            <VegetationView
+              vegetation={vegetation}
+              loading={loadingAnalysis}
+            />
+          )}
 
-        {activeTab === 'isro_hub' && (
-          <ISROHubView
-            onOpenCredentialsModal={() => setIsCredentialsOpen(true)}
-            siteName={currentSite.name}
-          />
-        )}
-      </main>
+          {activeTab === 'master_plan' && (
+            <MasterPlanDesigner
+              plans={plans}
+              activePlan={activePlan}
+              onSelectPlan={(p) => setActivePlan(p)}
+              onEditZone={(z) => setEditingZone(z)}
+              onRegeneratePlans={handleRegeneratePlans}
+              population={population}
+              areaAcres={areaAcres}
+              loading={loadingPlans}
+            />
+          )}
+
+          {activeTab === 'simulation' && (
+            <FutureSimulationView
+              basePopulation={population}
+            />
+          )}
+
+          {activeTab === 'isro_hub' && (
+            <ISROHubView
+              onOpenCredentialsModal={() => setIsCredentialsOpen(true)}
+              siteName={currentSite.name}
+            />
+          )}
+
+          {activeTab === 'advisor' && (
+            <TerraAdvisorPage
+              siteName={currentSite.name}
+              district={currentSite.district}
+              state={currentSite.state}
+              population={population}
+              areaAcres={areaAcres}
+              currentPlanCode={activePlan?.plan_code || 'PLAN_A'}
+              onOpenReport={() => setIsReportOpen(true)}
+              onSwitchTab={(tab) => setActiveTab(tab)}
+            />
+          )}
+        </main>
+      </div>
 
       {/* Slide-Over TerraAdvisor AI Drawer */}
       <TerraAdvisorDrawer
         isOpen={isAdvisorOpen}
         onClose={() => setIsAdvisorOpen(false)}
+        onOpen={() => setIsAdvisorOpen(true)}
+        onSwitchToFullPage={() => {
+          setIsAdvisorOpen(false);
+          setActiveTab('advisor');
+        }}
         siteName={currentSite.name}
         population={population}
         areaAcres={areaAcres}
