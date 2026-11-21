@@ -1,10 +1,11 @@
 {
-  "name": "project-astra",
+  "name": "terra-ai-root",
   "version": "1.0.0",
   "private": true,
-  "description": "TerraCity AI - Autonomous Greenfield Township Site Selection Engine",
+  "description": "TerraAI — AI-Powered Sustainable Smart City Planning Platform",
   "scripts": {
-    "build": "npm --prefix frontend install && npm --prefix frontend run build && node -e \"const fs = require('fs'); fs.cpSync('frontend/dist', 'dist', {recursive: true});\"",
-    "start": "python backend/app/main.py"
+    "build": "npm --prefix frontend install && npm --prefix frontend run build",
+    "dev": "npm --prefix frontend run dev",
+    "start": "npm --prefix frontend run preview"
   }
 }
