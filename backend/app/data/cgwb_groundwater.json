@@ -1,0 +1,79 @@
+{
+  "districts": {
+    "Guntur": {
+      "state": "Andhra Pradesh",
+      "assessment_year": "2023-2024",
+      "annual_extractable_ham": 128450.0,
+      "current_annual_extraction_ham": 74500.0,
+      "stage_of_extraction_pct": 58.0,
+      "category": "Safe",
+      "pre_monsoon_depth_m_bgl": 8.4,
+      "post_monsoon_depth_m_bgl": 4.2,
+      "trend_10yr": "Stable with seasonal recharge response (+0.08 m/yr)",
+      "salinity_ec_warning": false,
+      "fluoride_warning": false,
+      "primary_aquifer": "Alluvial Sand & Deep Sandstone (Krishna-Godavari Inter-basin)",
+      "limitations": "District-level CGWB spatial extrapolation. Micro-watershed borewell lithology required for localized pumping tests."
+    },
+    "Ahmedabad": {
+      "state": "Gujarat",
+      "assessment_year": "2023-2024",
+      "annual_extractable_ham": 142100.0,
+      "current_annual_extraction_ham": 122200.0,
+      "stage_of_extraction_pct": 86.0,
+      "category": "Semi-Critical",
+      "pre_monsoon_depth_m_bgl": 28.5,
+      "post_monsoon_depth_m_bgl": 24.1,
+      "trend_10yr": "Declining (-0.45 m/yr) due to heavy agrarian and industrial extraction",
+      "salinity_ec_warning": true,
+      "fluoride_warning": true,
+      "primary_aquifer": "Multi-layered Coastal Unconsolidated & Semi-consolidated Formations",
+      "limitations": "High salinity in shallow coastal aquifers; deep saline ingress risk. Desalination and RWH mandatory."
+    },
+    "Bengaluru Rural": {
+      "state": "Karnataka",
+      "assessment_year": "2023-2024",
+      "annual_extractable_ham": 28900.0,
+      "current_annual_extraction_ham": 41200.0,
+      "stage_of_extraction_pct": 142.5,
+      "category": "Over-Exploited",
+      "pre_monsoon_depth_m_bgl": 48.0,
+      "post_monsoon_depth_m_bgl": 42.5,
+      "trend_10yr": "Severe long-term secular decline (-1.2 m/yr) in fractured hard-rock granite",
+      "salinity_ec_warning": false,
+      "fluoride_warning": true,
+      "primary_aquifer": "Gneissic Hard Rock & Granitic Weathered Fissure Zone",
+      "limitations": "CGWB mandates strict zero-fresh-extraction zone without 100% artificial recharge structures."
+    },
+    "Jhansi": {
+      "state": "Uttar Pradesh",
+      "assessment_year": "2023-2024",
+      "annual_extractable_ham": 48200.0,
+      "current_annual_extraction_ham": 33740.0,
+      "stage_of_extraction_pct": 70.0,
+      "category": "Semi-Critical",
+      "pre_monsoon_depth_m_bgl": 14.8,
+      "post_monsoon_depth_m_bgl": 9.2,
+      "trend_10yr": "Erratic recharge depending on monsoon deficit cycles in Bundelkhand granite",
+      "salinity_ec_warning": false,
+      "fluoride_warning": false,
+      "primary_aquifer": "Bundelkhand Granitic Complex & Quartz Reef fractures",
+      "limitations": "Low specific yield (1-3%). Check dams and percolation tanks essential to buffer drought years."
+    },
+    "Pune": {
+      "state": "Maharashtra",
+      "assessment_year": "2023-2024",
+      "annual_extractable_ham": 115000.0,
+      "current_annual_extraction_ham": 82800.0,
+      "stage_of_extraction_pct": 72.0,
+      "category": "Semi-Critical",
+      "pre_monsoon_depth_m_bgl": 11.5,
+      "post_monsoon_depth_m_bgl": 5.8,
+      "trend_10yr": "Moderate recharge recovery during Western Ghats orographic monsoons",
+      "salinity_ec_warning": false,
+      "fluoride_warning": false,
+      "primary_aquifer": "Deccan Basaltic Lava Flows (Vesicular and Amygdaloidal horizons)",
+      "limitations": "Aquifer depth limited to upper 30-50m weathered zone; step-drawdown tests mandatory before site development."
+    }
+  }
+}
