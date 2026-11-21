@@ -1,0 +1,55 @@
+version: "1.0"
+
+water_balance:
+  # Baseline Phase-1 greenfield township population in 2026 (scales to ~380k-500k by 2050)
+  pop0: 150000
+  # Urban standard consumption: CPHEEO norm (Litres per Person per Day)
+  lpcd: 135.0
+  # Effective watershed runoff / catchment footprint multiplier relative to candidate site area
+  catchment_area_multiplier: 3.0
+  # Baseline external municipal or canal piped water supply allocation (Million Litres per Day)
+  external_supply_MLD: 15.0
+  # Rainwater harvesting bonus (MLD)
+  rwh_bonus_MLD: 0.0
+  # Hydrogeological recharge & harvesting yield fraction by groundwater / aquifer prospect class
+  yield_fraction:
+    Good: 0.20
+    Moderate: 0.12
+    Poor: 0.06
+    Very Poor: 0.03
+
+buffer_radii:
+  search_buffer_km: 15.0 # For OSM infrastructure
+  landslide_buffer_km: 5.0 # For landslide inventory
+  water_buffer_km: 15.0 # For perennial water bodies
+
+scenario_presets:
+  baseline:
+    name: "Baseline"
+    description: "Stable historical climate trajectory; safe/moderate stress range (< 0.8)."
+    growth_rate: 0.025
+    rainfall_change_pct: 0.0
+    lpcd_reduction_pct: 0.0
+    rwh_capture_share: 0.0
+
+  high_growth_dry:
+    name: "High Growth + Dry"
+    description: "Accelerated population growth paired with 15% rainfall reduction; crosses stress index = 1.0 around 2038-2044 on stressed sites."
+    growth_rate: 0.040
+    rainfall_change_pct: -15.0
+    lpcd_reduction_pct: 0.0
+    rwh_capture_share: 0.0
+
+  conservation:
+    name: "Conservation"
+    description: "Planned growth with 20% water conservation (108 lpcd) and 10% rainwater harvesting; pulls stress back below 0.8."
+    growth_rate: 0.025
+    rainfall_change_pct: 0.0
+    lpcd_reduction_pct: 20.0
+    rwh_capture_share: 0.10
+
+stress_bands:
+  low: [0.0, 0.4]
+  moderate: [0.4, 0.8]
+  high: [0.8, 1.0]
+  deficit: [1.0, 999.0]

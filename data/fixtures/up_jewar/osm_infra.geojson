@@ -1,0 +1,151 @@
+{
+  "type": "FeatureCollection",
+  "name": "OSM_Infrastructure_UP_Jewar",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Yamuna Expressway (6-lane access controlled)",
+        "type": "highway",
+        "highway_class": "motorway",
+        "speed_limit_kmh": 120
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            77.562,
+            28.1
+          ],
+          [
+            77.56,
+            28.15
+          ],
+          [
+            77.558,
+            28.2
+          ],
+          [
+            77.555,
+            28.25
+          ],
+          [
+            77.552,
+            28.28
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Jewar Airport Link Road / SH-22A",
+        "type": "highway",
+        "highway_class": "primary"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            77.5,
+            28.18
+          ],
+          [
+            77.54,
+            28.19
+          ],
+          [
+            77.58,
+            28.195
+          ],
+          [
+            77.64,
+            28.21
+          ],
+          [
+            77.67,
+            28.22
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Jewar 400/220kV Grid Substation",
+        "type": "substation",
+        "voltage_kv": 400,
+        "operator": "UPPTCL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.558,
+          28.205
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Noida International Airport Primary Substation (220kV)",
+        "type": "substation",
+        "voltage_kv": 220,
+        "operator": "YAPTL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.595,
+          28.165
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Kailash Multi-Specialty Hospital Jewar Extension",
+        "type": "hospital",
+        "beds": 250,
+        "amenity": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.55,
+          28.14
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Government Polytechnic Institute Jewar",
+        "type": "school",
+        "amenity": "college"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.545,
+          28.135
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Sector 28 Knowledge & Education Hub",
+        "type": "school",
+        "amenity": "university"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.54,
+          28.225
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+version: "1.0"
+
+dealbreakers:
+  - id: bhuvan_flood_hazard
+    name: "Severe Flood Hazard Zone"
+    description: "> 50% of the site is in the highest Bhuvan flood-hazard class (real Bhuvan data only, never proxy)."
+    type: "threshold"
+    indicator: "flood_hazard_highest_class_share"
+    alternative_indicators: ["flood_hazard_fraction", "flood_high_class_share", "flood_hazard_high_fraction"]
+    operator: ">"
+    threshold: 0.50 # > 50% (or 50.0 if percentage)
+    severity: "CRITICAL"
+    action: "DISQUALIFIED"
+    layer_key: "flood"
+    raster_threshold: 1
+
+  - id: wetland_encroachment
+    name: "Critical Wetland Overlap"
+    description: "Site overlaps a mapped wetland or perennial water body above 15%."
+    type: "threshold"
+    indicator: "wetland_overlap_share"
+    alternative_indicators: ["lulc_wetland_share", "wetland_share"]
+    operator: ">"
+    threshold: 0.15 # > 15% (or 15.0 if percentage)
+    severity: "CRITICAL"
+    action: "DISQUALIFIED"
+    layer_key: "wetland"
+    raster_threshold: 1
+
+  - id: steep_terrain
+    name: "Extreme Steep Slopes (> 30 deg)"
+    description: "> 30% of the site has terrain slope > 30%."
+    type: "threshold"
+    indicator: "slope_gt_30_share"
+    alternative_indicators: ["steep_slope_share", "slope_pct_gt_30"]
+    operator: ">"
+    threshold: 0.30 # > 30% (or 30.0 if percentage)
+    severity: "CRITICAL"
+    action: "DISQUALIFIED"
+    layer_key: "slope_gt_30"
+    raster_threshold: 30.0
+
+  - id: seismic_landslide_compound
+    name: "Compound Seismic V & Landslide Hazard"
+    description: "Seismic Zone V and High landslide hazard."
+    type: "compound"
+    conditions:
+      - indicator: "seismic_zone"
+        operator: "=="
+        target: "Zone V"
+      - indicator: "landslide_hazard"
+        operator: "in"
+        target: ["High", "Very High", 20.0, 0.0]
+    severity: "CRITICAL"
+    action: "DISQUALIFIED"
+    layer_key: "compound_hazard"

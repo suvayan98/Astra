@@ -1,0 +1,130 @@
+regions:
+  up_jewar:
+    id: "up_jewar"
+    name: "UP Jewar (Noida International Airport Region)"
+    state: "Uttar Pradesh"
+    is_primary: true
+    description: "Mega greenfield airport cluster in Gautam Buddha Nagar, UP. Primary demonstration region with complete 4-portal ISRO data coverage and Bhuvan flood inundation layer."
+    bbox: [77.48, 28.10, 77.68, 28.28]  # [min_lon, min_lat, max_lon, max_lat]
+    center: [77.58, 28.19]
+    default_zoom: 12
+    utm_epsg: 32643  # UTM Zone 43N
+    portals:
+      bhoonidhi:
+        status: "available"
+        dataset: "CartoDEM 30m v3R1"
+      bhuvan:
+        status: "available"
+        layers: ["lulc_50k", "flood_hazard", "water_bodies", "geomorphology"]
+      mosdac:
+        status: "available"
+        dataset: "INSAT-3D Rainfall Climatology"
+      vedas:
+        status: "available"
+        dataset: "Sentinel-2 NDVI 10m"
+    flood_method: "bhuvan_direct"  # Real Bhuvan flood hazard masking
+    candidate_sites:
+      - id: "site_a"
+        name: "Site A - Jewar North Greenfield (Sector 28-29)"
+        description: "Optimal gentle upland plain near Yamuna Expressway corridor with low flood risk and high buildable share."
+        polygon:
+          type: "Polygon"
+          coordinates:
+            - [
+                [77.525, 28.210],
+                [77.565, 28.210],
+                [77.565, 28.245],
+                [77.525, 28.245],
+                [77.525, 28.210]
+              ]
+      - id: "site_b"
+        name: "Site B - Jewar South Logistics Hub (Runway East)"
+        description: "Cargo and logistics corridor adjacent to airport boundary; moderate slope with good highway connectivity."
+        polygon:
+          type: "Polygon"
+          coordinates:
+            - [
+                [77.580, 28.140],
+                [77.620, 28.140],
+                [77.620, 28.175],
+                [77.580, 28.175],
+                [77.580, 28.140]
+              ]
+      - id: "site_c"
+        name: "Site C - Yamuna Floodplain Buffer (Lowland Margin)"
+        description: "Low-lying sector close to Yamuna river meander with higher seasonal waterlogging and wetland sensitivity."
+        polygon:
+          type: "Polygon"
+          coordinates:
+            - [
+                [77.490, 28.160],
+                [77.525, 28.160],
+                [77.525, 28.195],
+                [77.490, 28.195],
+                [77.490, 28.160]
+              ]
+
+  dholera:
+    id: "dholera"
+    name: "Dholera Special Investment Region (SIR)"
+    state: "Gujarat"
+    is_primary: false
+    description: "Greenfield smart city node along Gulf of Khambhat. Secondary region showcasing CartoDEM HAND proxy fallback when Bhuvan flood observations are sparse."
+    bbox: [72.10, 22.15, 72.35, 22.35]
+    center: [72.22, 22.25]
+    default_zoom: 12
+    utm_epsg: 32643  # UTM Zone 43N
+    portals:
+      bhoonidhi:
+        status: "available"
+        dataset: "CartoDEM 30m v3R1"
+      bhuvan:
+        status: "partial"
+        layers: ["lulc_50k", "water_bodies"]
+      mosdac:
+        status: "available"
+        dataset: "INSAT-3D Rainfall Climatology"
+      vedas:
+        status: "available"
+        dataset: "Sentinel-2 NDVI 10m"
+    flood_method: "hand_proxy"  # CartoDEM Height Above Nearest Drainage fallback
+    candidate_sites:
+      - id: "site_a"
+        name: "Site A - Dholera TP1 Activation Area"
+        description: "Central industrial and high-tech manufacturing zone with engineered drainage and high buildable share."
+        polygon:
+          type: "Polygon"
+          coordinates:
+            - [
+                [72.180, 22.220],
+                [72.230, 22.220],
+                [72.230, 22.260],
+                [72.180, 22.260],
+                [72.180, 22.220]
+              ]
+      - id: "site_b"
+        name: "Site B - Coastal Estuary Plain (Gulf Margin)"
+        description: "Low-lying tidal marsh boundary where HAND < 2m triggers flood risk warning via CartoDEM proxy."
+        polygon:
+          type: "Polygon"
+          coordinates:
+            - [
+                [72.260, 22.160],
+                [72.310, 22.160],
+                [72.310, 22.200],
+                [72.260, 22.200],
+                [72.260, 22.160]
+              ]
+      - id: "site_c"
+        name: "Site C - Dholera North Solar & Tech Hub"
+        description: "Inland flat plain with high solar potential, minimal vegetation clearing penalty, and moderate highway access."
+        polygon:
+          type: "Polygon"
+          coordinates:
+            - [
+                [72.140, 22.280],
+                [72.190, 22.280],
+                [72.190, 22.320],
+                [72.140, 22.320],
+                [72.140, 22.280]
+              ]
