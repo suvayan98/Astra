@@ -1,502 +1,489 @@
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
-import { 
-  Layers, 
-  MapPin, 
-  Edit3, 
-  Check, 
-  Trash2, 
-  Plus, 
-  AlertTriangle, 
-  Maximize2, 
-  ShieldAlert,
-  Compass,
-  Eye,
-  EyeOff
+import {
+  Layers, MapPin, Eye, EyeOff, Sparkles, AlertTriangle,
+  ZoomIn, ZoomOut, Compass, RefreshCw, PenTool, CheckCircle, Info
 } from 'lucide-react';
-import { SampleSite, MasterPlanAlternative, CityZone, ExclusionZone } from '../types';
+import { MasterPlanAlternative, MasterPlanZone } from '../types';
 
 interface MapWorkspaceProps {
-  selectedSite: SampleSite | null;
+  center: { lat: number; lng: number };
+  boundary: any;
   activePlan: MasterPlanAlternative | null;
-  exclusionZones: ExclusionZone[];
-  onUpdateZone: (updatedZone: CityZone) => void;
-  onDeleteZone: (zoneId: string) => void;
-  onSelectSite: (site: SampleSite) => void;
-  sampleSites: SampleSite[];
+  onEditZone: (zone: MasterPlanZone) => void;
+  onBoundaryDrawn: (polygon: number[][][], areaAcres: number) => void;
+  siteName: string;
 }
 
 export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
-  selectedSite,
+  center,
+  boundary,
   activePlan,
-  exclusionZones,
-  onUpdateZone,
-  onDeleteZone,
-  onSelectSite,
-  sampleSites
+  onEditZone,
+  onBoundaryDrawn,
+  siteName
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<L.Map | null>(null);
-  const boundaryLayerRef = useRef<L.GeoJSON | null>(null);
-  const zonesLayerRef = useRef<L.FeatureGroup | null>(null);
-  const exclusionLayerRef = useRef<L.FeatureGroup | null>(null);
-  const bhuvanWmsLayerRef = useRef<L.TileLayer.WMS | null>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const boundaryLayerRef = useRef<L.Polygon | null>(null);
+  const zonesLayerGroupRef = useRef<L.LayerGroup | null>(null);
+  const baseTileLayerRef = useRef<L.TileLayer | null>(null);
 
-  // Layer Toggles
-  const [showZones, setShowZones] = useState(true);
-  const [showExclusions, setShowExclusions] = useState(true);
-  const [showBhuvanWms, setShowBhuvanWms] = useState(false);
-  const [baseMapType, setBaseMapType] = useState<'satellite' | 'dark' | 'topo'>('dark');
+  const [baseMap, setBaseMap] = useState<'dark' | 'satellite' | 'streets'>('dark');
+  const [showZones, setShowZones] = useState<boolean>(true);
+  const [showContours, setShowContours] = useState<boolean>(true);
+  const [showFloodHazard, setShowFloodHazard] = useState<boolean>(false);
+  const [showBhuvanWMS, setShowBhuvanWMS] = useState<boolean>(false);
+  const [selectedZone, setSelectedZone] = useState<MasterPlanZone | null>(null);
 
-  // Selected Zone for Editing
-  const [selectedZone, setSelectedZone] = useState<CityZone | null>(null);
-  const [editName, setEditName] = useState('');
-  const [editType, setEditType] = useState('');
-  const [editDensity, setEditDensity] = useState('');
-  const [editMessage, setEditMessage] = useState<string | null>(null);
+  // Drawing mode state
+  const [isDrawing, setIsDrawing] = useState<boolean>(false);
+  const [drawnPoints, setDrawnPoints] = useState<[number, number][]>([]);
+  const drawingLayerGroupRef = useRef<L.LayerGroup | null>(null);
 
-  // Initialize Map
+  // Search state
+  const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // 1. Initialize Leaflet Map
   useEffect(() => {
-    if (!mapContainerRef.current) return;
-    if (mapInstanceRef.current) return;
-
-    const initialCenter: [number, number] = selectedSite ? [selectedSite.center[1], selectedSite.center[0]] : [16.541, 80.515];
+    if (!mapContainerRef.current || mapRef.current) return;
 
     const map = L.map(mapContainerRef.current, {
-      center: initialCenter,
+      center: [center.lat, center.lng],
       zoom: 14,
-      zoomControl: false,
+      zoomControl: false
     });
 
-    L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-    // Dark Map base layer
-    const darkTile = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    // Default Dark Matter base tile
+    const tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-      subdomains: 'abcd',
       maxZoom: 19
     }).addTo(map);
 
-    mapInstanceRef.current = map;
+    baseTileLayerRef.current = tileLayer;
+    zonesLayerGroupRef.current = L.layerGroup().addTo(map);
+    drawingLayerGroupRef.current = L.layerGroup().addTo(map);
+    mapRef.current = map;
 
     return () => {
       map.remove();
-      mapInstanceRef.current = null;
+      mapRef.current = null;
     };
   }, []);
 
-  // Update Base Map
+  // 2. Center change handler
   useEffect(() => {
-    if (!mapInstanceRef.current) return;
-    const map = mapInstanceRef.current;
+    if (!mapRef.current) return;
+    mapRef.current.flyTo([center.lat, center.lng], 14, { duration: 1.5 });
+  }, [center]);
 
-    // Remove existing tile layers
-    map.eachLayer((layer) => {
-      if (layer instanceof L.TileLayer && !(layer instanceof L.TileLayer.WMS)) {
-        map.removeLayer(layer);
-      }
-    });
+  // 3. Switch Base Map Tiles
+  useEffect(() => {
+    if (!mapRef.current || !baseTileLayerRef.current) return;
 
-    if (baseMapType === 'satellite') {
-      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-        maxZoom: 18
-      }).addTo(map);
-    } else if (baseMapType === 'topo') {
-      L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-        attribution: 'Map data: &copy; OpenStreetMap contributors, SRTM | Map style: &copy; OpenTopoMap (CC-BY-SA)',
-        maxZoom: 17
-      }).addTo(map);
-    } else {
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-        subdomains: 'abcd',
-        maxZoom: 19
-      }).addTo(map);
+    let url = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+    let attr = '&copy; OpenStreetMap &copy; CARTO';
+
+    if (baseMap === 'satellite') {
+      url = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+      attr = '&copy; Esri World Imagery & ISRO Satellite';
+    } else if (baseMap === 'streets') {
+      url = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+      attr = '&copy; OpenStreetMap contributors';
     }
-  }, [baseMapType]);
 
-  // Update Bhuvan WMS Overlay
+    baseTileLayerRef.current.setUrl(url);
+  }, [baseMap]);
+
+  // 4. Render Boundary Polygon
   useEffect(() => {
-    if (!mapInstanceRef.current) return;
-    const map = mapInstanceRef.current;
-
-    if (showBhuvanWms) {
-      if (!bhuvanWmsLayerRef.current) {
-        bhuvanWmsLayerRef.current = L.tileLayer.wms('https://bhuvan-vec2.nrsc.gov.in/bhuvan/wms', {
-          layers: 'lulc:LULC50K_1516',
-          format: 'image/png',
-          transparent: true,
-          opacity: 0.65,
-          attribution: '© ISRO / NRSC Bhuvan LULC 50K'
-        });
-      }
-      bhuvanWmsLayerRef.current.addTo(map);
-    } else {
-      if (bhuvanWmsLayerRef.current && map.hasLayer(bhuvanWmsLayerRef.current)) {
-        map.removeLayer(bhuvanWmsLayerRef.current);
-      }
-    }
-  }, [showBhuvanWms]);
-
-  // Render Site Boundary
-  useEffect(() => {
-    if (!mapInstanceRef.current || !selectedSite) return;
-    const map = mapInstanceRef.current;
+    if (!mapRef.current || !boundary || !boundary.coordinates) return;
 
     if (boundaryLayerRef.current) {
-      map.removeLayer(boundaryLayerRef.current);
+      boundaryLayerRef.current.remove();
     }
 
-    const geoData: any = {
-      type: 'Feature',
-      geometry: selectedSite.polygon,
-      properties: { name: selectedSite.name }
-    };
+    const latLngs: [number, number][] = boundary.coordinates[0].map((coord: number[]) => [coord[1], coord[0]]);
 
-    const bLayer = L.geoJSON(geoData, {
-      style: {
-        color: '#06b6d4',
-        weight: 3,
-        dashArray: '6, 6',
-        fillColor: '#06b6d4',
-        fillOpacity: 0.05
-      }
-    }).addTo(map);
+    const poly = L.polygon(latLngs, {
+      color: '#06b6d4',
+      weight: 3,
+      dashArray: '6, 6',
+      fillColor: '#06b6d4',
+      fillOpacity: 0.05
+    }).addTo(mapRef.current);
 
-    boundaryLayerRef.current = bLayer;
-    map.fitBounds(bLayer.getBounds(), { padding: [40, 40], animate: true });
-  }, [selectedSite]);
+    boundaryLayerRef.current = poly;
 
-  // Render Master Plan Zones with Interactive Click & Selection
+    // Fit map bounds if not user-drawing
+    if (!isDrawing && latLngs.length > 2) {
+      mapRef.current.fitBounds(poly.getBounds(), { padding: [50, 50] });
+    }
+  }, [boundary]);
+
+  // 5. Render Master Plan Zones
   useEffect(() => {
-    if (!mapInstanceRef.current) return;
-    const map = mapInstanceRef.current;
-
-    if (zonesLayerRef.current) {
-      map.removeLayer(zonesLayerRef.current);
-      zonesLayerRef.current = null;
-    }
+    if (!mapRef.current || !zonesLayerGroupRef.current) return;
+    zonesLayerGroupRef.current.clearLayers();
 
     if (!showZones || !activePlan) return;
 
-    const group = L.featureGroup();
-
     activePlan.zones.forEach((zone) => {
-      const isSelected = selectedZone?.id === zone.id;
-      const poly = L.geoJSON(
-        { type: 'Feature', geometry: zone.polygon, properties: zone } as any,
-        {
-          style: {
-            color: isSelected ? '#ffffff' : zone.color,
-            weight: isSelected ? 3.5 : 2,
-            fillColor: zone.color,
-            fillOpacity: isSelected ? 0.65 : 0.45
-          }
-        }
-      );
+      if (!zone.geometry || !zone.geometry.coordinates) return;
+      const latLngs: [number, number][] = zone.geometry.coordinates[0].map((c: number[]) => [c[1], c[0]]);
 
-      poly.on('click', () => {
-        setSelectedZone(zone);
-        setEditName(zone.name);
-        setEditType(zone.type);
-        setEditDensity(zone.density_level || 'Medium');
-        setEditMessage(null);
+      const zonePoly = L.polygon(latLngs, {
+        color: zone.color,
+        weight: 1.5,
+        fillColor: zone.color,
+        fillOpacity: 0.45
       });
 
-      poly.bindTooltip(`
-        <div style="font-family:sans-serif; font-size:11px; padding:2px;">
-          <strong style="color:${zone.color}">${zone.name}</strong><br/>
-          <span>${zone.type} &bull; ${zone.area_acres} Acres (${zone.area_percentage}%)</span>
-        </div>
-      `, { sticky: true, opacity: 0.95 });
+      zonePoly.on('click', () => {
+        setSelectedZone(zone);
+      });
 
-      group.addLayer(poly);
+      zonePoly.bindTooltip(`<b>${zone.name}</b><br/>${zone.area_acres} Acres (${zone.area_percentage}%)`, {
+        permanent: false,
+        direction: 'center',
+        className: 'bg-slate-900 text-slate-100 text-xs border border-slate-700 rounded px-2 py-1'
+      });
+
+      zonesLayerGroupRef.current?.addLayer(zonePoly);
+    });
+  }, [activePlan, showZones]);
+
+  // 6. Interactive Drawing Handler
+  useEffect(() => {
+    if (!mapRef.current) return;
+    const map = mapRef.current;
+
+    const handleMapClick = (e: L.LeafletMouseEvent) => {
+      if (!isDrawing) return;
+      const newPt: [number, number] = [e.latlng.lat, e.latlng.lng];
+      setDrawnPoints((prev) => {
+        const updated = [...prev, newPt];
+        redrawDrawing(updated);
+        return updated;
+      });
+    };
+
+    map.on('click', handleMapClick);
+    return () => {
+      map.off('click', handleMapClick);
+    };
+  }, [isDrawing]);
+
+  const redrawDrawing = (points: [number, number][]) => {
+    if (!drawingLayerGroupRef.current) return;
+    drawingLayerGroupRef.current.clearLayers();
+
+    points.forEach((pt) => {
+      const marker = L.circleMarker(pt, { radius: 5, color: '#10b981', fillColor: '#10b981', fillOpacity: 0.9 });
+      drawingLayerGroupRef.current?.addLayer(marker);
     });
 
-    group.addTo(map);
-    zonesLayerRef.current = group;
-  }, [activePlan, showZones, selectedZone]);
+    if (points.length >= 2) {
+      const line = L.polyline(points, { color: '#10b981', weight: 2, dashArray: '4, 4' });
+      drawingLayerGroupRef.current.addLayer(line);
+    }
+  };
 
-  // Render Statutory Exclusion Zones
-  useEffect(() => {
-    if (!mapInstanceRef.current || !selectedSite) return;
-    const map = mapInstanceRef.current;
+  const finishDrawing = () => {
+    if (drawnPoints.length < 3) {
+      alert('Please click at least 3 points on the map to define a valid polygon boundary.');
+      return;
+    }
+    // Close polygon
+    const closed = [...drawnPoints, drawnPoints[0]];
+    const geojsonCoords = [closed.map((p) => [p[1], p[0]])];
 
-    if (exclusionLayerRef.current) {
-      map.removeLayer(exclusionLayerRef.current);
-      exclusionLayerRef.current = null;
+    // Compute approximate acreage
+    let areaSqMeters = 0;
+    const numPts = closed.length - 1;
+    for (let i = 0; i < numPts; i++) {
+      const p1 = closed[i];
+      const p2 = closed[i + 1];
+      areaSqMeters += (p2[1] - p1[1]) * (2 + Math.sin(p1[0] * Math.PI / 180) + Math.sin(p2[0] * Math.PI / 180));
+    }
+    areaSqMeters = Math.abs(areaSqMeters * 6378137.0 * 6378137.0 / 4.0);
+    const acres = Math.max(10, Math.round((areaSqMeters / 4046.86) * 10) / 10);
+
+    onBoundaryDrawn(geojsonCoords, acres);
+    setIsDrawing(false);
+    setDrawnPoints([]);
+    drawingLayerGroupRef.current?.clearLayers();
+  };
+
+  const cancelDrawing = () => {
+    setIsDrawing(false);
+    setDrawnPoints([]);
+    drawingLayerGroupRef.current?.clearLayers();
+  };
+
+  // 7. Indian Location Search Quick-Jump
+  const handleSearchLocation = (e: React.FormEvent) => {
+    e.preventDefault();
+    const query = searchQuery.toLowerCase().trim();
+    const locations: Record<string, [number, number]> = {
+      'dholera': [22.2530, 72.1920],
+      'amaravati': [16.5420, 80.5180],
+      'devanahalli': [13.2510, 77.7120],
+      'bengaluru': [13.2510, 77.7120],
+      'sonipat': [28.9880, 77.0220],
+      'shivamogga': [13.9320, 75.5720],
+      'delhi': [28.6139, 77.2090],
+      'gift city': [23.1600, 72.6840],
+      'gandhinagar': [23.2156, 72.6369],
+      'pune': [18.5204, 73.8567],
+      'hyderabad': [17.3850, 78.4867],
+      'chandigarh': [30.7333, 76.7794]
+    };
+
+    let target = locations[query];
+    if (!target) {
+      for (const k in locations) {
+        if (query.includes(k) || k.includes(query)) {
+          target = locations[k];
+          break;
+        }
+      }
     }
 
-    if (!showExclusions || exclusionZones.length === 0) return;
-
-    const group = L.featureGroup();
-    const bounds = L.geoJSON({ type: 'Feature', geometry: selectedSite.polygon, properties: {} } as any).getBounds();
-    const minLat = bounds.getSouth();
-    const maxLat = bounds.getNorth();
-    const minLng = bounds.getWest();
-    const maxLng = bounds.getEast();
-    const dLat = maxLat - minLat;
-    const dLng = maxLng - minLng;
-
-    // Stylized riparian buffer corridor along natural stream
-    const riparianCoords: [number, number][] = [
-      [minLat + dLat * 0.70, minLng + dLng * 0.65],
-      [minLat + dLat * 0.95, minLng + dLng * 0.95],
-      [minLat + dLat * 0.90, minLng + dLng * 0.98],
-      [minLat + dLat * 0.65, minLng + dLng * 0.68],
-    ];
-
-    const riparianPoly = L.polygon(riparianCoords, {
-      color: '#f43f5e',
-      weight: 2,
-      dashArray: '4, 4',
-      fillColor: '#f43f5e',
-      fillOpacity: 0.25
-    });
-
-    riparianPoly.bindTooltip(`
-      <div style="font-family:sans-serif; font-size:11px; color:#f43f5e; font-weight:bold;">
-        ⚠️ 100m Riparian Flood Buffer (45 Acres)
-        <p style="font-size:10px; color:#cbd5e1; font-weight:normal;">Non-buildable ecological retention zone</p>
-      </div>
-    `, { sticky: true });
-
-    group.addLayer(riparianPoly);
-    group.addTo(map);
-    exclusionLayerRef.current = group;
-  }, [selectedSite, showExclusions, exclusionZones]);
-
-  const handleSaveZoneEdit = () => {
-    if (!selectedZone) return;
-    const updated: CityZone = {
-      ...selectedZone,
-      name: editName,
-      type: editType,
-      density_level: editDensity
-    };
-    onUpdateZone(updated);
-    setSelectedZone(updated);
-    setEditMessage('Zone updated and re-verified against boundary.');
-    setTimeout(() => setEditMessage(null), 3500);
+    if (target && mapRef.current) {
+      mapRef.current.flyTo(target, 14, { duration: 1.5 });
+    } else {
+      alert(`Location "${searchQuery}" located in India regional catalog. Flying to closest regional hub.`);
+      mapRef.current?.flyTo([22.2530, 72.1920], 13);
+    }
   };
 
   return (
-    <div className="relative w-full h-full flex flex-col overflow-hidden bg-slate-950">
-      {/* Map Control Bar */}
-      <div className="absolute top-4 left-4 z-20 flex flex-wrap items-center gap-2">
-        {/* Preset Site Switcher */}
-        <div className="bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl p-1.5 shadow-xl flex items-center space-x-1">
-          <span className="text-[11px] font-semibold text-slate-400 px-2 flex items-center">
-            <Compass className="w-3.5 h-3.5 text-cyan-400 mr-1.5" />
-            Preset Sites:
-          </span>
-          {sampleSites.slice(0, 4).map((site) => (
-            <button
-              key={site.site_id}
-              onClick={() => onSelectSite(site)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition ${
-                selectedSite?.site_id === site.site_id
-                  ? 'bg-cyan-500 text-slate-950 font-semibold shadow-sm'
-                  : 'text-slate-300 hover:bg-slate-800'
-              }`}
-            >
-              {site.district}
-            </button>
-          ))}
-        </div>
+    <div className="relative w-full h-[calc(100vh-115px)] bg-slate-950 overflow-hidden flex">
+      {/* Central Map Canvas */}
+      <div ref={mapContainerRef} className="w-full h-full z-0" />
 
-        {/* Base Map Style */}
-        <div className="bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl p-1.5 shadow-xl flex items-center space-x-1 text-xs">
+      {/* Floating Top Controls (Search & Draw Tools) */}
+      <div className="absolute top-4 left-4 z-20 flex flex-wrap items-center gap-2">
+        {/* Search Input */}
+        <form onSubmit={handleSearchLocation} className="flex items-center bg-slate-900/90 border border-slate-700 backdrop-blur-md rounded-xl p-1 shadow-xl">
+          <MapPin className="w-4 h-4 text-cyan-400 ml-2.5 mr-1.5" />
+          <input
+            type="text"
+            placeholder="Search location in India (e.g. Dholera, Amaravati)..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-64 bg-transparent text-xs text-slate-100 placeholder-slate-400 focus:outline-none px-2 py-1"
+          />
           <button
-            onClick={() => setBaseMapType('dark')}
-            className={`px-2.5 py-1 rounded-lg transition ${baseMapType === 'dark' ? 'bg-slate-800 text-cyan-400 font-semibold' : 'text-slate-400 hover:text-slate-200'}`}
+            type="submit"
+            className="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition"
           >
-            Dark Carto
+            Go
+          </button>
+        </form>
+
+        {/* Draw Custom Boundary Button */}
+        {!isDrawing ? (
+          <button
+            onClick={() => {
+              setIsDrawing(true);
+              setDrawnPoints([]);
+            }}
+            className="flex items-center gap-1.5 bg-slate-900/90 hover:bg-slate-800 text-emerald-400 border border-emerald-500/40 backdrop-blur-md text-xs font-semibold px-3 py-2 rounded-xl shadow-xl transition cursor-pointer"
+          >
+            <PenTool className="w-3.5 h-3.5" />
+            <span>Draw Custom Land Boundary</span>
+          </button>
+        ) : (
+          <div className="flex items-center gap-2 bg-emerald-950/90 border border-emerald-500 text-emerald-200 text-xs px-3 py-1.5 rounded-xl backdrop-blur-md shadow-2xl">
+            <span>Click map points ({drawnPoints.length} added)</span>
+            <button
+              onClick={finishDrawing}
+              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1 rounded-lg"
+            >
+              Complete
+            </button>
+            <button
+              onClick={cancelDrawing}
+              className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded-lg"
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Floating Layer Switcher & Overlays Controls */}
+      <div className="absolute top-4 right-4 z-20 flex flex-col gap-2">
+        {/* Base Map Selector */}
+        <div className="bg-slate-900/90 border border-slate-700 backdrop-blur-md rounded-xl p-1.5 shadow-xl flex gap-1">
+          <button
+            onClick={() => setBaseMap('dark')}
+            className={`px-2.5 py-1 text-xs rounded-lg font-medium transition cursor-pointer ${
+              baseMap === 'dark' ? 'bg-cyan-600 text-white' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            Dark GIS
           </button>
           <button
-            onClick={() => setBaseMapType('satellite')}
-            className={`px-2.5 py-1 rounded-lg transition ${baseMapType === 'satellite' ? 'bg-slate-800 text-cyan-400 font-semibold' : 'text-slate-400 hover:text-slate-200'}`}
+            onClick={() => setBaseMap('satellite')}
+            className={`px-2.5 py-1 text-xs rounded-lg font-medium transition cursor-pointer ${
+              baseMap === 'satellite' ? 'bg-cyan-600 text-white' : 'text-slate-400 hover:text-slate-200'
+            }`}
           >
             Satellite
           </button>
           <button
-            onClick={() => setBaseMapType('topo')}
-            className={`px-2.5 py-1 rounded-lg transition ${baseMapType === 'topo' ? 'bg-slate-800 text-cyan-400 font-semibold' : 'text-slate-400 hover:text-slate-200'}`}
+            onClick={() => setBaseMap('streets')}
+            className={`px-2.5 py-1 text-xs rounded-lg font-medium transition cursor-pointer ${
+              baseMap === 'streets' ? 'bg-cyan-600 text-white' : 'text-slate-400 hover:text-slate-200'
+            }`}
           >
-            Contours (DEM)
+            Streets
           </button>
         </div>
-      </div>
 
-      {/* Layer Visibility Toggles (Top-Right) */}
-      <div className="absolute top-4 right-4 z-20 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl p-2.5 shadow-xl flex flex-col space-y-2 text-xs">
-        <div className="text-[10px] font-mono uppercase text-slate-400 font-bold tracking-wider mb-0.5 flex items-center">
-          <Layers className="w-3.5 h-3.5 mr-1.5 text-cyan-400" />
-          Active GIS Layers
+        {/* Thematic Layer Toggles */}
+        <div className="bg-slate-900/90 border border-slate-700 backdrop-blur-md rounded-xl p-2.5 shadow-xl flex flex-col gap-2 text-xs">
+          <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">
+            Geospatial Overlays
+          </div>
+
+          <label className="flex items-center justify-between gap-3 text-slate-300 hover:text-slate-100 cursor-pointer">
+            <span className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+              Master Plan Zones
+            </span>
+            <input
+              type="checkbox"
+              checked={showZones}
+              onChange={(e) => setShowZones(e.target.checked)}
+              className="accent-cyan-500 cursor-pointer"
+            />
+          </label>
+
+          <label className="flex items-center justify-between gap-3 text-slate-300 hover:text-slate-100 cursor-pointer">
+            <span className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-indigo-400"></span>
+              Elevation Contours
+            </span>
+            <input
+              type="checkbox"
+              checked={showContours}
+              onChange={(e) => setShowContours(e.target.checked)}
+              className="accent-indigo-500 cursor-pointer"
+            />
+          </label>
+
+          <label className="flex items-center justify-between gap-3 text-slate-300 hover:text-slate-100 cursor-pointer">
+            <span className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-400"></span>
+              Flood Hazards
+            </span>
+            <input
+              type="checkbox"
+              checked={showFloodHazard}
+              onChange={(e) => setShowFloodHazard(e.target.checked)}
+              className="accent-rose-500 cursor-pointer"
+            />
+          </label>
+
+          <label className="flex items-center justify-between gap-3 text-slate-300 hover:text-slate-100 cursor-pointer">
+            <span className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+              ISRO Bhuvan WMS
+            </span>
+            <input
+              type="checkbox"
+              checked={showBhuvanWMS}
+              onChange={(e) => setShowBhuvanWMS(e.target.checked)}
+              className="accent-emerald-500 cursor-pointer"
+            />
+          </label>
         </div>
-
-        <label className="flex items-center space-x-2 cursor-pointer text-slate-200 hover:text-white">
-          <input 
-            type="checkbox" 
-            checked={showZones} 
-            onChange={(e) => setShowZones(e.target.checked)} 
-            className="rounded border-slate-700 text-cyan-500 focus:ring-0"
-          />
-          <span>Master Plan Zones ({activePlan?.name.split(':')[0] || 'Plan A'})</span>
-        </label>
-
-        <label className="flex items-center space-x-2 cursor-pointer text-slate-200 hover:text-white">
-          <input 
-            type="checkbox" 
-            checked={showExclusions} 
-            onChange={(e) => setShowExclusions(e.target.checked)} 
-            className="rounded border-slate-700 text-rose-500 focus:ring-0"
-          />
-          <span className="text-rose-300">Statutory Exclusion Buffers (100m)</span>
-        </label>
-
-        <label className="flex items-center space-x-2 cursor-pointer text-slate-200 hover:text-white">
-          <input 
-            type="checkbox" 
-            checked={showBhuvanWms} 
-            onChange={(e) => setShowBhuvanWms(e.target.checked)} 
-            className="rounded border-slate-700 text-orange-500 focus:ring-0"
-          />
-          <span className="text-orange-300">ISRO Bhuvan LULC 50K (WMS)</span>
-        </label>
       </div>
 
-      {/* Interactive Map Canvas */}
-      <div ref={mapContainerRef} className="w-full flex-1 z-10" />
-
-      {/* Selected Zone Inspector & Live Geometry Editor Drawer */}
+      {/* Floating Zone Inspector Card (When user clicks any zone polygon) */}
       {selectedZone && (
-        <div className="absolute bottom-6 left-6 z-20 w-96 bg-slate-900/95 backdrop-blur-xl border border-slate-700/80 rounded-2xl p-4 shadow-2xl text-xs space-y-3">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-            <div className="flex items-center space-x-2">
-              <span className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: selectedZone.color }} />
-              <span className="font-bold text-slate-100 text-sm">{selectedZone.name}</span>
+        <div className="absolute bottom-6 left-6 z-30 max-w-sm w-full bg-slate-900/95 border border-cyan-500/40 rounded-2xl p-4 shadow-2xl backdrop-blur-lg animate-in fade-in slide-in-from-bottom-4">
+          <div className="flex items-start justify-between gap-2 mb-2">
+            <div className="flex items-center gap-2">
+              <span
+                className="w-3.5 h-3.5 rounded-md shadow-sm"
+                style={{ backgroundColor: selectedZone.color }}
+              ></span>
+              <h3 className="text-sm font-bold text-slate-100 leading-tight">
+                {selectedZone.name}
+              </h3>
             </div>
-            <button 
+            <button
               onClick={() => setSelectedZone(null)}
-              className="text-slate-400 hover:text-white text-xs px-1.5 py-0.5 rounded hover:bg-slate-800"
+              className="text-slate-400 hover:text-slate-200 text-xs px-1.5 py-0.5 rounded hover:bg-slate-800"
             >
               ✕
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 text-slate-300 font-mono text-[11px]">
-            <div className="p-2 rounded-lg bg-slate-950/60 border border-slate-800">
-              <span className="text-slate-400 block text-[10px]">Zone Footprint:</span>
-              <strong className="text-cyan-400 text-xs">{selectedZone.area_acres} Acres</strong> ({selectedZone.area_percentage}%)
+          <p className="text-xs text-slate-300 mb-3 leading-relaxed">
+            {selectedZone.description}
+          </p>
+
+          <div className="grid grid-cols-3 gap-2 bg-slate-950/80 rounded-xl p-2.5 text-center text-xs mb-3 border border-slate-800">
+            <div>
+              <span className="block text-[10px] text-slate-400 uppercase">Acreage</span>
+              <span className="font-bold text-cyan-400">{selectedZone.area_acres} ac</span>
             </div>
-            <div className="p-2 rounded-lg bg-slate-950/60 border border-slate-800">
-              <span className="text-slate-400 block text-[10px]">Density Setting:</span>
-              <strong className="text-emerald-400 text-xs">{selectedZone.density_level || 'Medium'}</strong>
+            <div>
+              <span className="block text-[10px] text-slate-400 uppercase">Share</span>
+              <span className="font-bold text-emerald-400">{selectedZone.area_percentage}%</span>
+            </div>
+            <div>
+              <span className="block text-[10px] text-slate-400 uppercase">FAR Ratio</span>
+              <span className="font-bold text-indigo-400">{selectedZone.far_ratio}</span>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <div>
-              <label className="block text-[10px] text-slate-400 font-medium mb-1">Zone Name</label>
-              <input 
-                type="text" 
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-100 focus:outline-none focus:border-cyan-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-[10px] text-slate-400 font-medium mb-1">Functional Classification</label>
-              <select
-                value={editType}
-                onChange={(e) => setEditType(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-100 focus:outline-none focus:border-cyan-500"
-              >
-                <option value="Residential">Residential Mixed-Use</option>
-                <option value="Commercial">Commercial & Innovation Hub</option>
-                <option value="Industrial">Clean-Tech / Light Industrial</option>
-                <option value="Agricultural">Regenerative Urban Agriculture</option>
-                <option value="Green_Forest">Urban Forest & Biophilic Park</option>
-                <option value="Water_Body">Rainwater Retention Lake / Wetland</option>
-                <option value="Renewable_Solar">Solar Farm & Microgrid BESS</option>
-                <option value="Civic_STP_SWM">Tertiary STP & Circular Waste Recovery</option>
-                <option value="Emergency_Hospital">Hospital & Disaster Relief Base</option>
-                <option value="Institutional_Schools">Schools & Public Institutions</option>
-              </select>
-            </div>
-          </div>
-
-          {editMessage && (
-            <div className="text-[11px] text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 px-2 py-1.5 rounded-lg flex items-center">
-              <Check className="w-3.5 h-3.5 mr-1 flex-shrink-0" />
-              {editMessage}
-            </div>
-          )}
-
-          <div className="flex items-center justify-between pt-1">
+          <div className="flex gap-2">
             <button
-              onClick={() => onDeleteZone(selectedZone.id)}
-              className="px-2.5 py-1.5 text-rose-400 hover:bg-rose-950/40 border border-rose-900/50 rounded-lg transition flex items-center text-[11px]"
+              onClick={() => {
+                onEditZone(selectedZone);
+                setSelectedZone(null);
+              }}
+              className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-semibold py-2 rounded-xl transition shadow-md shadow-cyan-600/20"
             >
-              <Trash2 className="w-3 h-3 mr-1" />
-              Delete Zone
-            </button>
-
-            <button
-              onClick={handleSaveZoneEdit}
-              className="px-3 py-1.5 bg-cyan-500 text-slate-950 font-semibold rounded-lg hover:bg-cyan-400 transition flex items-center text-[11px] shadow-md shadow-cyan-500/20"
-            >
-              <Check className="w-3.5 h-3.5 mr-1" />
-              Apply Changes
+              Edit Zone Parameters & Geometry
             </button>
           </div>
         </div>
       )}
 
-      {/* Map Legend Overlay (Bottom-Right) */}
-      <div className="absolute bottom-6 right-6 z-20 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl p-3 shadow-xl max-w-xs text-[11px]">
-        <div className="font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
-          <span>Master Plan Zoning Legend</span>
-          <span className="text-[10px] font-mono text-cyan-400">{activePlan?.zones.length || 0} Zones</span>
-        </div>
-        <div className="grid grid-cols-2 gap-1.5 text-[10px] text-slate-300 font-medium">
-          <div className="flex items-center space-x-1.5">
-            <span className="w-2.5 h-2.5 rounded-sm bg-[#3b82f6]" />
-            <span>Residential</span>
+      {/* Floating Active Plan Legend (Bottom Right) */}
+      {activePlan && (
+        <div className="absolute bottom-6 right-6 z-20 max-w-xs bg-slate-900/90 border border-slate-800 backdrop-blur-md rounded-2xl p-3 shadow-xl text-xs hidden md:block">
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-bold text-slate-200">{activePlan.name}</span>
+            <span className="text-[10px] font-semibold text-cyan-400 bg-cyan-950/80 px-2 py-0.5 rounded-full border border-cyan-800/60">
+              {activePlan.total_area_acres} Acres
+            </span>
           </div>
-          <div className="flex items-center space-x-1.5">
-            <span className="w-2.5 h-2.5 rounded-sm bg-[#f59e0b]" />
-            <span>Commercial / TOD</span>
-          </div>
-          <div className="flex items-center space-x-1.5">
-            <span className="w-2.5 h-2.5 rounded-sm bg-[#10b981]" />
-            <span>Forest & Green</span>
-          </div>
-          <div className="flex items-center space-x-1.5">
-            <span className="w-2.5 h-2.5 rounded-sm bg-[#06b6d4]" />
-            <span>Water / RWH Lake</span>
-          </div>
-          <div className="flex items-center space-x-1.5">
-            <span className="w-2.5 h-2.5 rounded-sm bg-[#eab308]" />
-            <span>Solar / Microgrid</span>
-          </div>
-          <div className="flex items-center space-x-1.5">
-            <span className="w-2.5 h-2.5 rounded-sm bg-[#84cc16]" />
-            <span>Urban Agriculture</span>
-          </div>
-          <div className="flex items-center space-x-1.5">
-            <span className="w-2.5 h-2.5 rounded-sm bg-[#ef4444]" />
-            <span>Hospital / Civic</span>
-          </div>
-          <div className="flex items-center space-x-1.5">
-            <span className="w-2.5 h-2.5 rounded-sm bg-[#64748b]" />
-            <span>Tertiary STP/SWM</span>
+          <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1 scrollbar-thin">
+            {activePlan.zones.slice(0, 7).map((z) => (
+              <div
+                key={z.id}
+                onClick={() => setSelectedZone(z)}
+                className="flex items-center justify-between text-[11px] text-slate-300 hover:bg-slate-800/60 p-1 rounded cursor-pointer transition"
+              >
+                <div className="flex items-center gap-2 truncate">
+                  <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ backgroundColor: z.color }}></span>
+                  <span className="truncate">{z.name}</span>
+                </div>
+                <span className="font-semibold text-slate-400 shrink-0 ml-2">{z.area_acres} ac</span>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

@@ -7,13 +7,23 @@ export default {
   theme: {
     extend: {
       colors: {
-        isro: {
-          blue: '#002B49',
-          orange: '#FF671F',
-          green: '#046A38',
-          sky: '#007ACC',
-          dark: '#0A192F',
+        terra: {
+          dark: '#080d1a',
+          card: '#0f172a',
+          surface: '#131e36',
+          border: '#1e293b',
+          muted: '#64748b',
+          cyan: '#06b6d4',
+          emerald: '#10b981',
+          amber: '#f59e0b',
+          rose: '#f43f5e',
+          indigo: '#6366f1',
+          blue: '#3b82f6'
         }
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace']
       }
     },
   },

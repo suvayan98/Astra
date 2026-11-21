@@ -1,171 +1,148 @@
-# TerraCity AI
+# TerraAI — AI-Powered Sustainable Smart City Planning Platform
 
-> **Space-Driven Greenfield Urban Site Screening & Resilience Stress-Testing**  
-> *ASTRA 2026 Hackathon (ANTERiX, VIT Bhopal — Theme: Space)*
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![React](https://img.shields.io/badge/Frontend-React_18_TypeScript-61DAFB?logo=react&logoColor=black)](https://react.dev)
+[![Leaflet](https://img.shields.io/badge/GIS-Leaflet_1.9-199900?logo=leaflet&logoColor=white)](https://leafletjs.com)
+[![ISRO](https://img.shields.io/badge/Satellite_Data-ISRO_Bhoonidhi_|_Bhuvan_|_MOSDAC_|_VEDAS-FF9933?logo=satellites&logoColor=white)](https://isro.gov.in)
+[![CGWB](https://img.shields.io/badge/Groundwater-CGWB_IN--GRES-0284c7)](http://cgwb.gov.in)
+[![Tailwind CSS](https://img.shields.io/badge/Styling-Tailwind_CSS_3.4-38B2AC?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688.svg?style=flat&logo=fastapi)](https://fastapi.tiangolo.com)
-[![React](https://img.shields.io/badge/React-19-61DAFB.svg?style=flat&logo=react)](https://reactjs.org)
-[![Python](https://img.shields.io/badge/Python-3.11+-3776AB.svg?style=flat&logo=python)](https://python.org)
-[![ISRO Portals](https://img.shields.io/badge/ISRO_Portals-4_Active-FF9933.svg?style=flat)](https://www.isro.gov.in)
-[![Offline Mode](https://img.shields.io/badge/Offline_Demo-100%25_Ready-green.svg?style=flat)](#offline-mode)
-
----
-
-## Overview
-
-TerraCity AI is an explainable decision-support web platform that empowers state urban planning agencies and infrastructure developers to screen candidate land parcels for new greenfield cities or industrial townships across India. Powered by datasets from **four Indian Earth Observation portals**, TerraCity AI evaluates land capability across 5 pillars, detects fatal spatial deal-breakers, ranks sites with sensitivity weight toggles, and stress-tests water balance and flood risk through the year 2050.
+**TerraAI** is a geospatial intelligence and AI platform designed for urban planners, geospatial engineers, researchers, and government agencies. It enables users to select land boundaries (e.g., 500 acres / 2.02 km²), analyze terrain, soil, groundwater, climate hazards, and renewable energy, and synthesize AI-generated master plans with editable zoning polygons, 10-to-100-year future simulations, and conversational planning guidance.
 
 ---
 
-## Four-Portal Space Provenance
-
-TerraCity AI integrates real data from four official Indian space portals:
+## Key Modules & Architecture
 
 ```
-+-----------------------------------------------------------------------------------------+
-|                                    TERRACITY AI                                         |
-+-------------------+--------------------+--------------------+---------------------------+
-|    BHOONIDHI      |       BHUVAN       |      MOSDAC        |          VEDAS            |
-|   (NRSC/ISRO)     |    (NRSC/ISRO)     |    (SAC/ISRO)      |        (SAC/ISRO)         |
-+-------------------+--------------------+--------------------+---------------------------+
-| CartoDEM 30m DEM  | LULC 1:50k &       | INSAT-3D/3DR Daily | Sentinel-2 Multi-Temporal |
-| Stereo-Derived    | Historical Flood   | Precipitation      | NDVI (10m) Time-Series    |
-| Surface Model     | Hazard Zonation    | Climatology        | & Vegetation Health       |
-+-------------------+--------------------+--------------------+---------------------------+
-| • Mean Slope      | • Land Cover Class | • Annual Mean Rain | • Mean NDVI               |
-| • Buildable Share | • Wetland Overlap  | • Rainfall CV      | • Multi-Year Trend        |
-| • Roughness (TRI) | • Flood Frequency  | • Dry Month Count  | • Ecological Sensitivity  |
-| • HAND Proxy      | • Groundwater Pot. | • Drought Exposure |   (LULC Cross-Validated)  |
-+-------------------+--------------------+--------------------+---------------------------+
+                                  +------------------------------------+
+                                  |     TerraAI Web Application        |
+                                  | React 18 + TypeScript + Vite + GIS |
+                                  +-----------------+------------------+
+                                                    | (REST / GeoJSON)
+                                  +-----------------v------------------+
+                                  |       FastAPI Geospatial Backend   |
+                                  +-----------------+------------------+
+                                                    |
+          +-----------------------+-----------------+----------------------+----------------------+
+          |                       |                                        |                      |
++---------v----------+  +---------v----------+                  +----------v---------+  +---------v----------+
+|  ISRO Space Hub    |  |  Hydrology & Water |                  |  Terrain & Soil    |  |  Master Plan AI    |
+| • Bhoonidhi (STAC) |  | • CGWB IN-GRES     |                  | • NASA SRTM 30m    |  | • Plan A (Compact) |
+| • Bhuvan (WMS LULC)|  | • CPHEEO (135 LPCD)|                  | • ICAR Soil Orders |  | • Plan B (AgroEco) |
+| • MOSDAC (Weather) |  | • RWH Yield Model  |                  | • Geotech Advisory |  | • Plan C (Circular)|
+| • VEDAS (NDVI)     |  | • DEWATS Recycling |                  | • Contours & Flow  |  | • 12 GeoJSON Zones |
++--------------------+  +--------------------+                  +--------------------+  +--------------------+
 ```
+
+### 1. Core Modules Breakdown
+
+- **Module A: TerraSite AI — Intelligent Site Selection**: 12-factor Analytical Hierarchy Process (AHP) scoring methodology with transparent factor weighting, exclusion zone identification (wetlands, floodplains, steep slopes), and benchmark candidate site comparisons across India.
+- **Module B: TerraTerrain AI — Terrain & Geological Intelligence**: 30m NASA SRTM / Copernicus elevation profiles, slope distribution (<5% flat, 5-15% moderate, >15% steep), aspect, terrain roughness index, flow accumulation vectors, and prominent geotechnical engineering compliance warnings.
+- **Module C: TerraSoil AI — Soil Intelligence**: ICAR Indian soil taxonomy (Vertisols, Alfisols, Inceptisols, Entisols), sand/silt/clay texture ratios, soil organic carbon (SOC %), shrink-swell expansiveness, agricultural capability, and compulsory on-site testing protocols (SPT N-values, soaked CBR, Atterberg limits).
+- **Module D: TerraWater AI — Water Intelligence & CGWB**: CPHEEO urban standards (135 LPCD domestic + 27 LPCD civic = 162 LPCD for 20,000 people = 3.24 MLD). Official CGWB block groundwater assessments (recharge MCM, draft MCM, stage of extraction %, pre/post water table mbgl). Rainwater harvesting (RWH) potential ($A \times R \times C$) and DEWATS wastewater recycling balance.
+- **Module E: TerraClimate AI — Climate & Disaster Intelligence**: MOSDAC Hydro-Estimator extreme 24-hr precipitation (50-year return storm), heatwave hazard index, flood susceptibility zoning, multi-purpose disaster relief shelters, and emergency evacuation corridors.
+- **Module F: TerraEnergy AI — Renewable Energy Intelligence**: Global Solar Atlas GHI insolation, utility solar farm sizing (35 acres $\rightarrow$ 9.2 MWp), rooftop PV potential (11.5 MWp), annual clean generation vs 27.0 GWh settlement demand, and Lithium Iron Phosphate (LFP) BESS storage sizing (24-28 MWh) for evening peak shifting.
+- **Module G: TerraVegetation AI — Green City Planner**: VEDAS 15-day composite NDVI & EVI temporal progression curves, agro-climatic native tree species catalog (*Azadirachta indica*, *Ficus religiosa*, *Syzygium cumini*, *Pongamia pinnata*, *Terminalia arjuna*), and Miyawaki ultra-dense afforestation standards.
+- **Module H: TerraCity Designer — AI Master Plan Generator**: Synthesizes 3 distinct paradigms:
+  - **Plan A: Compact & Walkable City (TOD)**: 15-minute city, FAR 2.4, continuous peripheral 125-acre green loop, 78% transit mode share.
+  - **Plan B: Green & Low-Density Settlement**: Agro-ecological hamlets, 120-acre organic farming zone, cascade tank (kere) wetlands, FAR 1.2.
+  - **Plan C: Resource-Efficient Smart City**: Circular economy, 75-acre clean-tech park, smart microgrid, dual-reticulation graywater recycling.
+  - **Realism & Density Verification**: Evaluates 20,000 people across 500 acres ($2.02\text{ km}^2$) yielding gross density of 9,886 people/km² (~40 people/acre) with comprehensive density and infrastructure trade-off analysis.
+  - **Interactive Zone Editor**: Inspect, resize, re-classify, and edit any zone polygon in real-time.
+- **Module I: TerraFuture AI — Long-Term Multi-Decade Simulation**: Simulates urban evolution over 10, 20, 50, and 100 years under 5 scenarios (Sustainable Development, Business as Usual, High Growth Boomtown, Severe Water Stress, Net-Zero Resilient) with interactive sliders for population growth, water LPCD, rainfall variance, and renewable MW.
+- **Module J: TerraAdvisor AI — Conversational Planning Assistant**: Grounded AI assistant answering natural language questions citing CPHEEO, CGWB, MOSDAC, VEDAS, and exact formulas.
+- **Module 4: ISRO Space Data Hub (ASTRA Feature)**: Dedicated dashboard displaying metadata, acquisition dates, ground sampling distance, and live query runners for:
+  1. **BHOONIDHI (ISRO / NRSC)**: STAC API v1.0.0 search for Cartosat-3, Resourcesat-2A LISS-IV, Sentinel-2, RISAT-1A SAR.
+  2. **BHUVAN (ISRO / NRSC)**: OGC WMS thematic layers (LULC 50K, Geomorphology, Lithology, Lineaments, Waterbodies).
+  3. **MOSDAC (ISRO / SAC)**: Meteorological products (Hydro-Estimator rainfall, TIR brightness temperature, wind vectors).
+  4. **VEDAS (ISRO / SAC)**: Multi-temporal NDVI/EVI 15-day composites and land degradation atlases.
 
 ---
 
-## Key Features
+## Technology Stack
 
-1. **Hybrid Map Site Selection**:
-   - 1-click **"Load Candidate Sites (A, B, C)"** button per demo region.
-   - Freehand interactive polygon drawing and live shape editing via `@geoman-io/leaflet-geoman-free`.
-2. **Sub-150ms Dynamic Zonal Analysis**:
-   - Live in-memory raster masking (`rasterio.mask` + `shapely` + `numpy`) calculates real zonal metrics for arbitrary custom drawn polygons.
-3. **5-Pillar Multi-Criteria Scorecard**:
-   - *Terrain & Land* (20%), *Water Security* (25%), *Hazard Risk* (30%), *Environmental Impact* (10%), *Infrastructure Access* (15%).
-   - Interactive Planner Priority Presets: **Balanced**, **Climate-Resilient**, and **Infra-First**.
-   - Dynamic weight renormalization if any regional layer is absent.
-4. **Spatial Deal-Breakers**:
-   - Automatic disqualification for hard hazards: >50% high Bhuvan flood inundation, >15% wetland encroachment, >30% slope >30%, or Seismic Zone V + high landslide risk.
-   - Offending raster cells are polygonized and rendered in **translucent red** inside site boundaries on the map canvas.
-5. **Calibrated 2026–2050 Water Stress Simulation**:
-   - Tracks Phase-1 population (150,000) scaling to 500,000 by 2050 against CPHEEO 135 lpcd standard.
-   - Models local rainfall harvesting, catchment runoff (3.0x multiplier), and external canal supply.
-   - Identifies the exact deficit crossing year under *Baseline*, *Moderate Warming*, and *High-Growth + Dry* climate trajectories.
-6. **Printable HTML Reports & GeoJSON Export**:
-   - Standalone `@media print` styled executive report ready for A4 PDF export.
-   - GeoJSON FeatureCollection with all scores, verdicts, and provenance attached for QGIS/ArcGIS.
+| Layer | Technologies |
+| :--- | :--- |
+| **Frontend** | React 18, TypeScript, Vite, Tailwind CSS, Leaflet 1.9, Recharts, Lucide Icons |
+| **Backend** | Python 3.14 / 3.11+, FastAPI, Pydantic v2, Uvicorn, Requests, HTTPX |
+| **Geospatial & Math** | Shapely, PyProj, Rasterio, NumPy, SciPy, Pandas |
+| **Space Data Adapters** | ISRO Bhoonidhi STAC, ISRO Bhuvan WMS, ISRO MOSDAC, ISRO VEDAS |
+| **Hydrology & Climate** | CGWB IN-GRES Groundwater Assessment, NASA POWER, NASA SRTM 30m DEM |
 
 ---
 
-## Architecture & Tech Stack
+## Quickstart & Installation
 
-- **Backend**: Python 3.11+, FastAPI, Pydantic v2, rasterio, shapely, pyproj, numpy, SQLite analysis store, pyyaml, httpx, pytest.
-- **Frontend**: React 19, TypeScript, Vite, Tailwind CSS, Leaflet + Geoman, Recharts, Lucide Icons.
-- **Data Caching**: Regional COG rasters and GeoJSON vectors stored in `data/cache/regions/` and `data/fixtures/` for 100% offline operation.
-
----
-
-## Quickest 1-Click Launch (Unified Server & Web UI)
-
-The frontend is pre-built into `frontend/dist` and directly served by the FastAPI application. You can launch the complete website and backend with a single command:
-
-```powershell
-python start_app.py
-```
-*(Or on Windows, simply double-click **`start_app.bat`**).*
-
-This will start the unified server on **[http://localhost:8000](http://localhost:8000)** and automatically pop open your default web browser to the interactive website!
-
----
-
-## Local Run Instructions (Development Mode)
-
-### Prerequisites
-- Python 3.11+
-- Node.js 18+ (with `npm` or `npm.cmd` on Windows)
-
-### 1. Quick Start via Windows PowerShell
-
-Open a PowerShell terminal in the repository root:
-
-```powershell
-# Copy environment template
-Copy-Item .env.example .env
-
-# Install backend dependencies
-python -m pip install -r backend/requirements.txt
-
-# Run backend tests
-python -m pytest backend/tests -v
-
-# Start FastAPI backend server (Port 8000)
-python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
-```
-
-In a second PowerShell terminal:
-
-```powershell
-# Navigate to frontend and install dependencies
-cd frontend
-npm.cmd install
-
-# Start Vite development server (Port 5173)
-npm.cmd run dev
-```
-
-Open your browser to:
-- **Frontend App**: [http://localhost:5173](http://localhost:5173)
-- **FastAPI OpenAPI Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
-- **API Health Check**: [http://localhost:8000/api/health](http://localhost:8000/api/health)
-
-### 2. Quick Start via Makefile (Linux / macOS / Git Bash)
-
+### 1. Clone the Repository
 ```bash
-# Setup both backend and frontend
-make setup
-
-# Run test suite
-make test
-
-# Start backend server
-make run-backend
-
-# In another terminal: start frontend
-make run-frontend
+git clone https://github.com/your-username/terra-ai.git
+cd terra-ai
 ```
 
+### 2. Backend Setup (FastAPI)
+Make sure Python is installed on your system.
+```bash
+# Create and activate virtual environment (optional)
+python -m venv venv
+# On Windows:
+venv\Scripts\activate
+# On Linux/macOS:
+source venv/bin/activate
+
+# Install dependencies
+pip install fastapi uvicorn pydantic pydantic-settings shapely pyproj rasterio numpy scipy pandas httpx python-dotenv
+
+# Run the FastAPI server
+uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
+```
+The backend API documentation is available interactively at `http://127.0.0.1:8000/docs`.
+
+### 3. Frontend Setup (React + Vite)
+In a separate terminal:
+```bash
+cd frontend
+
+# Install npm dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+Open `http://localhost:3000` in your web browser.
+
 ---
 
-## 3-Minute Live Demo Script
+## Environment Variables Configuration
 
-Follow this script for a flawless hackathon jury demonstration:
-
-| Time | Segment | Actions to Perform | What to Highlight |
-| :---: | :--- | :--- | :--- |
-| **0:00 - 0:30** | **Load & Draw** | 1. Select **UP Jewar** from the region selector.<br/>2. Click **"Load Candidate Sites (A, B, C)"** in 1 click.<br/>3. Draw a custom polygon freehand on the map canvas using the draw tool. | Show that preset candidate sites load instantly and live custom-drawn polygons run real spatial zonal math dynamically in < 150 ms offline. |
-| **0:30 - 1:05** | **Scorecard & Provenance** | 1. Click **Analyse All Sites**.<br/>2. Select **Site A** to view its 5-pillar scorecard and Recharts radar gauge.<br/>3. Click on the **Bhoonidhi** and **MOSDAC** indicator source badges. | Point out honest 4-portal provenance metadata: exact dataset name, resolution (30m / 4km), vintage (2021-2024), and confidence tier. |
-| **1:05 - 1:50** | **Compare, Deal-Breakers & Sensitivity** | 1. Switch to the **Compare** tab.<br/>2. Observe **Site B** flagged with a **Red Deal-Breaker Banner** (Severe Flood Hazard).<br/>3. Notice the **translucent red floodplain mask** overlaid on the map.<br/>4. Toggle from **Balanced** to **Climate-Resilient** and **Infra-First** priority presets. | Demonstrate live MCA rank shifts. Point out deterministic "why" explanations generated from top-3 numeric pillar drivers, and the tie-check advisory. |
-| **1:50 - 2:25** | **2026–2050 Stress Test** | 1. Open the **Stress Test** tab.<br/>2. View the 2026–2050 water demand vs supply area chart for Site A under Baseline (< 0.8 stress).<br/>3. Switch scenario to **High Growth + Dry**.<br/>4. Point out the water stress index visibly crossing 1.0 (water deficit year detected). | Explain the calibrated physical water balance: 500,000 × 135 lpcd = 67.5 MLD demand, local rainwater harvest yield, and uncertainty bands. |
-| **2:25 - 3:00** | **Four-Portal Proof & Export** | 1. Open the **Sources** tab to display the 4-portal verification matrix.<br/>2. Optionally switch region to **Dholera** to showcase the transparent **CartoDEM HAND flood proxy fallback**.<br/>3. Click **Print Report** (clean print CSS preview).<br/>4. Click **Download GeoJSON**. | Reiterate that all four Indian space portals supply active indicators. Demonstrate GIS interoperability with instant GeoJSON download. |
+Copy `.env.example` to `.env` in the root directory:
+```bash
+cp .env.example .env
+```
+Key variables:
+- `BHOONIDHI_API_KEY`: ISRO Bhoonidhi STAC Bearer Token
+- `BHUVAN_TOKEN`: ISRO Bhuvan Thematic Gateway Token
+- `MOSDAC_USER` / `MOSDAC_KEY`: ISRO MOSDAC credentials
+- `VEDAS_API_KEY`: ISRO VEDAS Temporal API Key
+- `DEMO_MODE=True`: Automatically utilizes verified authentic sample space data cache when live credentials are unconfigured.
 
 ---
 
-## Honest Positioning & Non-Goals
+## Demonstration Workflow: 500-Acre Smart Settlement
 
-- **Targeted Gap**: Early-stage greenfield site screening across terrain, water, and hazards using Indian satellite data.
-- **Not in Scope**: Master planning, internal zoning, street network design, or 100-year survival predictions.
-- **Existing Systems**: We complement—rather than replace—PM GatiShakti (national transport corridor logistics), AMRUT 2.0 (brownfield city master plans), and VEDAS Urban Sprawl (historical sprawl monitoring).
+1. **Launch Workspace**: Open `http://localhost:3000`. The map workspace initializes with the **Dholera Greenfield Industrial Smart Zone** preset (500 acres / 2.02 km² for 20,000 people).
+2. **Review Suitability**: Switch to the **Site Suitability** tab to inspect the 12-factor radar profile (Score: 84.5 / 100), exclusion buffers along low swales, and transparent AHP methodology.
+3. **Inspect Terrain & Soil**: Review the elevation range (6.5m to 14.2m), gentle gradient (1.2°), shrink-swell clay expansiveness in Vertisols, and the compulsory geotechnical borehole engineering disclaimer.
+4. **Water Security Audit**: Observe the 3.24 MLD daily municipal demand, CGWB semi-critical extraction stage (82.6%), 2.2 MLD rainwater harvesting capture, and 2.1 MLD DEWATS graywater recovery.
+5. **AI Master Plan Designer**:
+   - Compare **Plan A (Compact TOD)**, **Plan B (Green Eco-Settlement)**, and **Plan C (Resource-Efficient Smart City)**.
+   - Verify gross population density ($9,886\text{ people/km}^2$) and per-capita public green space ($25.3\text{ m}^2$).
+   - Click any zone in the table to modify its area or FAR in the interactive modal.
+6. **Future Multi-Decadal Simulation**: Move sliders on the **Future Simulation** tab to project water deficits, aquifer stress %, and solid waste over 10, 20, 50, and 100 years.
+7. **ISRO Space Data Hub**: Open the ISRO Hub to view live status for Bhoonidhi, Bhuvan, MOSDAC, and VEDAS, and execute a STAC query on the active AOI bounding box.
+8. **Consult TerraAdvisor AI**: Open the AI drawer and ask questions like *"How much water will 20,000 people require?"* or *"Compare Plan A and Plan B"* to receive grounded engineering responses.
+9. **Export Master Plan Report**: Click **Report** to print the executive dossier or download the complete Master Plan as GeoJSON and Markdown.
 
 ---
 
 ## License
-
-Built for the **ASTRA 2026 Hackathon**. Open-source under the [MIT License](LICENSE).
+MIT License. Developed for sustainable geospatial urban intelligence.

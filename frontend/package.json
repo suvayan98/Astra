@@ -1,36 +1,32 @@
 {
-  "name": "frontend",
+  "name": "terra-ai-frontend",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "oxlint",
+    "build": "tsc && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@geoman-io/leaflet-geoman-free": "^2.20.8",
-    "@types/leaflet": "^1.9.22",
     "clsx": "^2.1.1",
     "leaflet": "^1.9.4",
-    "lucide-react": "^1.77.0",
-    "react": "^19.3.1",
-    "react-dom": "^19.3.1",
-    "recharts": "^3.11.0",
-    "tailwind-merge": "^3.7.1"
+    "lucide-react": "^1.16.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "recharts": "^2.13.0",
+    "tailwind-merge": "^2.5.4"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.3.5",
-    "@types/node": "^24.19.2",
-    "@types/react": "^19.3.0",
-    "@types/react-dom": "^19.3.0",
-    "@vitejs/plugin-react": "^6.1.2",
-    "autoprefixer": "^10.7.0",
-    "oxlint": "^1.90.0",
-    "postcss": "^8.5.33",
-    "tailwindcss": "^4.3.5",
-    "typescript": "~7.0.2",
-    "vite": "^8.3.6"
+    "@types/leaflet": "^1.9.14",
+    "@types/node": "^22.9.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
   }
 }

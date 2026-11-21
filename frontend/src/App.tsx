@@ -1,237 +1,348 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
-import { LeftPanel } from './components/LeftPanel';
-import { MapView } from './components/MapView';
-import { RightPanel, RightPanelTab } from './components/RightPanel';
-import { AssumptionsDrawer } from './components/AssumptionsDrawer';
+import { MapWorkspace } from './components/MapWorkspace';
+import { SiteSuitabilityView } from './components/SiteSuitabilityView';
+import { TerrainSoilView } from './components/TerrainSoilView';
+import { WaterIntelligenceView } from './components/WaterIntelligenceView';
+import { ClimateDisasterView } from './components/ClimateDisasterView';
+import { RenewableEnergyView } from './components/RenewableEnergyView';
+import { VegetationView } from './components/VegetationView';
+import { MasterPlanDesigner } from './components/MasterPlanDesigner';
+import { FutureSimulationView } from './components/FutureSimulationView';
+import { ISROHubView } from './components/ISROHubView';
+import { TerraAdvisorDrawer } from './components/TerraAdvisorDrawer';
+import { ReportExportModal } from './components/ReportExportModal';
+import { CredentialsModal } from './components/CredentialsModal';
+import { EditZoneModal } from './components/EditZoneModal';
+
 import {
-  Region,
-  RegionId,
-  PriorityPreset,
-  ScenarioPreset,
-  CandidateSite,
-  SiteScorecard,
-  CompareResult,
-  StressTestResponse,
-  ProvenanceRecord,
-  Assumptions,
-  LayerOverlay,
+  fetchPresetSites, analyzeSite, analyzeTerrain, analyzeSoil,
+  analyzeWater, analyzeClimate, analyzeEnergy, analyzeVegetation,
+  generateMasterPlans, editZone, getISROStatus
+} from './api';
+
+import {
+  SiteSuitabilityResult, TerrainAnalysisResult, SoilAnalysisResult,
+  WaterIntelligenceResult, ClimateDisasterResult, RenewableEnergyResult,
+  VegetationIntelligenceResult, MasterPlanAlternative, MasterPlanZone
 } from './types';
-import {
-  DEMO_REGIONS,
-  DEFAULT_ASSUMPTIONS,
-  PROVENANCE_RECORDS,
-  LAYER_OVERLAYS,
-  generateSiteScorecard,
-  generateCompareResult,
-  generateStressTest,
-} from './data/mockData';
-import { ApiClient, HealthStatus } from './lib/api';
 
-export function App() {
-  // 1. Core State
-  const [regions, setRegions] = useState<Region[]>(DEMO_REGIONS);
-  const [selectedRegionId, setSelectedRegionId] = useState<RegionId>('up_jewar');
-  const currentRegion = regions.find((r) => r.id === selectedRegionId) || regions[0];
+export const App: React.FC = () => {
+  // Navigation
+  const [activeTab, setActiveTab] = useState<string>('master_plan');
 
-  const [candidateSites, setCandidateSites] = useState<CandidateSite[]>(currentRegion.candidateSites);
-  const [selectedSiteCode, setSelectedSiteCode] = useState<'A' | 'B' | 'C'>('A');
+  // Planning Parameters
+  const [presetSites, setPresetSites] = useState<any[]>([]);
+  const [selectedSiteId, setSelectedSiteId] = useState<string>('site-dholera');
+  const [population, setPopulation] = useState<number>(20000);
+  const [areaAcres, setAreaAcres] = useState<number>(500.0);
+  const [customBoundary, setCustomBoundary] = useState<any | null>(null);
 
-  const [targetPopulation, setTargetPopulation] = useState<number>(450000);
-  const [horizon, setHorizon] = useState<2035 | 2050>(2050);
-  const [priorityPreset, setPriorityPreset] = useState<PriorityPreset>('balanced');
-  const [scenarioPreset, setScenarioPreset] = useState<ScenarioPreset>('baseline');
-  const [assumptions, setAssumptions] = useState<Assumptions>(DEFAULT_ASSUMPTIONS);
+  // Analysis State
+  const [suitability, setSuitability] = useState<SiteSuitabilityResult | null>(null);
+  const [terrain, setTerrain] = useState<TerrainAnalysisResult | null>(null);
+  const [soil, setSoil] = useState<SoilAnalysisResult | null>(null);
+  const [water, setWater] = useState<WaterIntelligenceResult | null>(null);
+  const [climate, setClimate] = useState<ClimateDisasterResult | null>(null);
+  const [energy, setEnergy] = useState<RenewableEnergyResult | null>(null);
+  const [vegetation, setVegetation] = useState<VegetationIntelligenceResult | null>(null);
 
-  const [layerOverlays, setLayerOverlays] = useState<LayerOverlay[]>(LAYER_OVERLAYS);
-  const [activeTab, setActiveTab] = useState<RightPanelTab>('scorecard');
-  const [isAssumptionsOpen, setIsAssumptionsOpen] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  // Master Plans
+  const [plans, setPlans] = useState<MasterPlanAlternative[]>([]);
+  const [activePlan, setActivePlan] = useState<MasterPlanAlternative | null>(null);
 
-  // Health and connection state
-  const [health, setHealth] = useState<HealthStatus>({
-    status: 'healthy',
-    mode: 'offline_fixtures',
-    version: '1.0.0',
-    fourPortalsConnected: true,
-  });
+  // Loading States
+  const [loadingAnalysis, setLoadingAnalysis] = useState<boolean>(true);
+  const [loadingPlans, setLoadingPlans] = useState<boolean>(true);
 
-  // Analysis results
-  const [scorecards, setScorecards] = useState<Record<string, SiteScorecard>>({});
-  const [compareResult, setCompareResult] = useState<CompareResult>(() =>
-    generateCompareResult('up_jewar', 'balanced', 'baseline', DEFAULT_ASSUMPTIONS)
-  );
-  const [stressTestResult, setStressTestResult] = useState<StressTestResponse>(() =>
-    generateStressTest('site_a', 'up_jewar', 2050, 450000, 'baseline', DEFAULT_ASSUMPTIONS)
-  );
-  const [provenanceRecords, setProvenanceRecords] = useState<ProvenanceRecord[]>(PROVENANCE_RECORDS);
+  // Drawers & Modals
+  const [isAdvisorOpen, setIsAdvisorOpen] = useState<boolean>(false);
+  const [isReportOpen, setIsReportOpen] = useState<boolean>(false);
+  const [isCredentialsOpen, setIsCredentialsOpen] = useState<boolean>(false);
+  const [editingZone, setEditingZone] = useState<MasterPlanZone | null>(null);
 
-  // Check API health on load
+  // 1. Initial Load of Preset Sites
   useEffect(() => {
-    ApiClient.checkHealth().then((status) => {
-      setHealth(status);
-    });
+    const initPresets = async () => {
+      try {
+        const sites = await fetchPresetSites();
+        setPresetSites(sites);
+        if (sites.length > 0) {
+          const defaultSite = sites[0];
+          setSelectedSiteId(defaultSite.id);
+          setAreaAcres(defaultSite.area_acres);
+          setPopulation(defaultSite.target_population);
+          loadAllData(defaultSite.id, defaultSite.area_acres, defaultSite.target_population, null);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    initPresets();
   }, []);
 
-  // Recalculate analysis
-  const executeAnalysis = useCallback(async () => {
-    setIsAnalyzing(true);
+  // 2. Load all analytical pipelines
+  const loadAllData = async (siteId: string, acres: number, pop: number, customBnd: any) => {
+    setLoadingAnalysis(true);
+    setLoadingPlans(true);
 
     try {
-      // Analyze all 3 candidate sites
-      const cardA = await ApiClient.analyzeSite(selectedRegionId, 'A', priorityPreset, assumptions);
-      const cardB = await ApiClient.analyzeSite(selectedRegionId, 'B', priorityPreset, assumptions);
-      const cardC = await ApiClient.analyzeSite(selectedRegionId, 'C', priorityPreset, assumptions);
+      // Find site in preset list
+      const site = presetSites.find((s) => s.id === siteId) || presetSites[0];
+      const boundaryToUse = customBnd || (site ? site.boundary : null);
 
-      const newScorecards: Record<string, SiteScorecard> = {
-        [candidateSites.find((s) => s.code === 'A')?.id || 'site_a']: cardA,
-        [candidateSites.find((s) => s.code === 'B')?.id || 'site_b']: cardB,
-        [candidateSites.find((s) => s.code === 'C')?.id || 'site_c']: cardC,
-      };
+      const [suitRes, terrRes, soilRes, waterRes, climRes, enerRes, vegRes, plansRes] = await Promise.all([
+        analyzeSite({
+          name: site ? site.name : "Custom Site",
+          boundary: boundaryToUse || { type: "Polygon", coordinates: [] },
+          area_acres: acres,
+          target_population: pop,
+          district: site ? site.district : "Ahmedabad",
+          state: site ? site.state : "Gujarat"
+        }),
+        analyzeTerrain({ site_id: siteId }),
+        analyzeSoil({ site_id: siteId }),
+        analyzeWater({ site_id: siteId, population: pop, area_acres: acres }),
+        analyzeClimate({ site_id: siteId }),
+        analyzeEnergy({ site_id: siteId, population: pop, area_acres: acres }),
+        analyzeVegetation({ site_id: siteId, area_acres: acres }),
+        generateMasterPlans({
+          site_id: siteId,
+          boundary: boundaryToUse || { type: "Polygon", coordinates: [] },
+          total_area_acres: acres,
+          target_population: pop
+        })
+      ]);
 
-      setScorecards(newScorecards);
-
-      // Multi-site comparison
-      const comp = await ApiClient.compareSites(selectedRegionId, priorityPreset, scenarioPreset, assumptions);
-      setCompareResult(comp);
-
-      // Water balance stress test for active site
-      const activeSiteId = candidateSites.find((s) => s.code === selectedSiteCode)?.id || 'site_a';
-      const stress = await ApiClient.runStressTest(
-        activeSiteId,
-        selectedRegionId,
-        horizon,
-        targetPopulation,
-        scenarioPreset,
-        assumptions
-      );
-      setStressTestResult(stress);
+      setSuitability(suitRes);
+      setTerrain(terrRes);
+      setSoil(soilRes);
+      setWater(waterRes);
+      setClimate(climRes);
+      setEnergy(enerRes);
+      setVegetation(vegRes);
+      setPlans(plansRes);
+      if (plansRes.length > 0) {
+        setActivePlan(plansRes[0]);
+      }
     } catch (err) {
-      console.error('Analysis execution error:', err);
+      console.error(err);
     } finally {
-      setTimeout(() => {
-        setIsAnalyzing(false);
-      }, 300);
-    }
-  }, [
-    selectedRegionId,
-    candidateSites,
-    selectedSiteCode,
-    priorityPreset,
-    scenarioPreset,
-    assumptions,
-    targetPopulation,
-    horizon,
-  ]);
-
-  // Run analysis when parameters change
-  useEffect(() => {
-    executeAnalysis();
-  }, [selectedRegionId, priorityPreset, scenarioPreset, horizon, targetPopulation, assumptions]);
-
-  // Handle region switch
-  const handleSelectRegion = (regionId: RegionId) => {
-    if (regionId === selectedRegionId) return;
-    setSelectedRegionId(regionId);
-    const newReg = regions.find((r) => r.id === regionId);
-    if (newReg) {
-      setCandidateSites(newReg.candidateSites);
-      setSelectedSiteCode('A');
+      setLoadingAnalysis(false);
+      setLoadingPlans(false);
     }
   };
 
-  // 1-Click Load Preset Sites
-  const handleLoadPresetSites = () => {
-    const reg = regions.find((r) => r.id === selectedRegionId);
-    if (reg) {
-      setCandidateSites(reg.candidateSites);
-      setSelectedSiteCode('A');
-      executeAnalysis();
+  const handleSelectSite = (siteId: string) => {
+    setSelectedSiteId(siteId);
+    setCustomBoundary(null);
+    const site = presetSites.find((s) => s.id === siteId);
+    if (site) {
+      setAreaAcres(site.area_acres);
+      setPopulation(site.target_population);
+      loadAllData(siteId, site.area_acres, site.target_population, null);
     }
   };
 
-  // Toggle Layer Overlay Visibility
-  const handleToggleLayer = (layerId: LayerOverlay['id']) => {
-    setLayerOverlays((prev) =>
-      prev.map((l) => (l.id === layerId ? { ...l, visible: !l.visible } : l))
-    );
+  const handleBoundaryDrawn = (polygonCoords: number[][][], computedAcres: number) => {
+    const newBoundary = { type: 'Polygon', coordinates: polygonCoords };
+    setCustomBoundary(newBoundary);
+    setAreaAcres(computedAcres);
+    loadAllData(selectedSiteId, computedAcres, population, newBoundary);
+  };
+
+  const handleRegeneratePlans = async (priorities: string[]) => {
+    setLoadingPlans(true);
+    try {
+      const site = presetSites.find((s) => s.id === selectedSiteId);
+      const bnd = customBoundary || (site ? site.boundary : null);
+      const newPlans = await generateMasterPlans({
+        site_id: selectedSiteId,
+        boundary: bnd || { type: "Polygon", coordinates: [] },
+        total_area_acres: areaAcres,
+        target_population: population,
+        sustainability_priorities: priorities
+      });
+      setPlans(newPlans);
+      if (newPlans.length > 0) {
+        setActivePlan(newPlans[0]);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingPlans(false);
+    }
+  };
+
+  const handleEditZoneSave = async (updatedFields: Partial<MasterPlanZone>) => {
+    if (!editingZone || !activePlan) return;
+    try {
+      await editZone(selectedSiteId || 'active_session', {
+        plan_id: activePlan.plan_id,
+        zone_id: editingZone.id,
+        ...updatedFields
+      });
+
+      // Update state locally
+      const updatedZones = activePlan.zones.map((z) => {
+        if (z.id === editingZone.id) {
+          return { ...z, ...updatedFields } as MasterPlanZone;
+        }
+        return z;
+      });
+
+      const updatedPlan = { ...activePlan, zones: updatedZones };
+      setActivePlan(updatedPlan);
+      setPlans((prev) => prev.map((p) => p.plan_id === updatedPlan.plan_id ? updatedPlan : p));
+      setEditingZone(null);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const currentSite = presetSites.find((s) => s.id === selectedSiteId) || {
+    name: 'India Greenfield Site',
+    center: { lat: 22.2530, lng: 72.1920 },
+    boundary: { type: 'Polygon', coordinates: [] }
   };
 
   return (
-    <div className="app-container flex flex-col h-screen w-screen bg-slate-50 text-slate-900 overflow-hidden font-sans">
-      {/* Top Navigation Bar */}
+    <div className="min-h-screen bg-[#080d1a] text-slate-100 flex flex-col font-sans">
+      {/* Top Main Navigation */}
       <Navbar
-        currentRegion={currentRegion}
-        priorityPreset={priorityPreset}
-        scenarioPreset={scenarioPreset}
-        health={health}
-        onOpenAssumptions={() => setIsAssumptionsOpen(true)}
-        onOpenReport={() => setActiveTab('report')}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        presetSites={presetSites}
+        selectedSiteId={selectedSiteId}
+        onSelectSite={handleSelectSite}
+        population={population}
+        setPopulation={(newPop) => {
+          setPopulation(newPop);
+          loadAllData(selectedSiteId, areaAcres, newPop, customBoundary);
+        }}
+        areaAcres={areaAcres}
+        isroConnected={true}
+        onOpenAdvisor={() => setIsAdvisorOpen(true)}
+        onOpenReport={() => setIsReportOpen(true)}
+        onOpenIsroModal={() => setIsCredentialsOpen(true)}
       />
 
-      {/* Main 3-Column Layout */}
-      <div className="flex flex-1 overflow-hidden relative">
-        {/* Left Column: Parameter & Scenario Controls */}
-        <LeftPanel
-          regions={regions}
-          selectedRegionId={selectedRegionId}
-          onSelectRegion={handleSelectRegion}
-          candidateSites={candidateSites}
-          onLoadCandidateSites={handleLoadPresetSites}
-          targetPopulation={targetPopulation}
-          onChangeTargetPopulation={setTargetPopulation}
-          horizon={horizon}
-          onChangeHorizon={setHorizon}
-          priorityPreset={priorityPreset}
-          onChangePriorityPreset={setPriorityPreset}
-          scenarioPreset={scenarioPreset}
-          onChangeScenarioPreset={setScenarioPreset}
-          onRunAnalysis={executeAnalysis}
-          isAnalyzing={isAnalyzing}
-        />
-
-        {/* Center Canvas: Leaflet Map with Geoman Drawing & Overlays */}
-        <main className="map-container flex-1 h-full relative overflow-hidden">
-          <MapView
-            currentRegion={currentRegion}
-            candidateSites={candidateSites}
-            onUpdateCandidateSites={setCandidateSites}
-            selectedSiteCode={selectedSiteCode}
-            onSelectSiteCode={setSelectedSiteCode}
-            scorecards={scorecards}
-            layerOverlays={layerOverlays}
-            onToggleLayer={handleToggleLayer}
+      {/* Main Workspace Area */}
+      <main className="flex-1 overflow-x-hidden">
+        {activeTab === 'map' && (
+          <MapWorkspace
+            center={currentSite.center}
+            boundary={customBoundary || currentSite.boundary}
+            activePlan={activePlan}
+            onEditZone={(zone) => setEditingZone(zone)}
+            onBoundaryDrawn={handleBoundaryDrawn}
+            siteName={currentSite.name}
           />
-        </main>
+        )}
 
-        {/* Right Column: 5 Tabbed Panes (Scorecard, Compare, Stress Test, Sources, Report) */}
-        <RightPanel
-          currentRegion={currentRegion}
-          candidateSites={candidateSites}
-          selectedSiteCode={selectedSiteCode}
-          onSelectSiteCode={setSelectedSiteCode}
-          scorecards={scorecards}
-          compareResult={compareResult}
-          stressTestResult={stressTestResult}
-          provenanceRecords={provenanceRecords}
-          priorityPreset={priorityPreset}
-          scenarioPreset={scenarioPreset}
-          targetPopulation={targetPopulation}
-          horizon={horizon}
-          activeTab={activeTab}
-          onChangeTab={setActiveTab}
-        />
-      </div>
+        {activeTab === 'suitability' && (
+          <SiteSuitabilityView
+            suitability={suitability}
+            loading={loadingAnalysis}
+          />
+        )}
 
-      {/* Slide-over Assumptions & Coefficients Drawer */}
-      <AssumptionsDrawer
-        isOpen={isAssumptionsOpen}
-        onClose={() => setIsAssumptionsOpen(false)}
-        assumptions={assumptions}
-        onUpdateAssumptions={setAssumptions}
+        {activeTab === 'terrain_soil' && (
+          <TerrainSoilView
+            terrain={terrain}
+            soil={soil}
+            loading={loadingAnalysis}
+          />
+        )}
+
+        {activeTab === 'water' && (
+          <WaterIntelligenceView
+            water={water}
+            loading={loadingAnalysis}
+          />
+        )}
+
+        {activeTab === 'climate' && (
+          <ClimateDisasterView
+            climate={climate}
+            loading={loadingAnalysis}
+          />
+        )}
+
+        {activeTab === 'energy' && (
+          <RenewableEnergyView
+            energy={energy}
+            loading={loadingAnalysis}
+          />
+        )}
+
+        {activeTab === 'vegetation' && (
+          <VegetationView
+            vegetation={vegetation}
+            loading={loadingAnalysis}
+          />
+        )}
+
+        {activeTab === 'master_plan' && (
+          <MasterPlanDesigner
+            plans={plans}
+            activePlan={activePlan}
+            onSelectPlan={(p) => setActivePlan(p)}
+            onEditZone={(z) => setEditingZone(z)}
+            onRegeneratePlans={handleRegeneratePlans}
+            population={population}
+            areaAcres={areaAcres}
+            loading={loadingPlans}
+          />
+        )}
+
+        {activeTab === 'simulation' && (
+          <FutureSimulationView
+            basePopulation={population}
+          />
+        )}
+
+        {activeTab === 'isro_hub' && (
+          <ISROHubView
+            onOpenCredentialsModal={() => setIsCredentialsOpen(true)}
+            siteName={currentSite.name}
+          />
+        )}
+      </main>
+
+      {/* Slide-Over TerraAdvisor AI Drawer */}
+      <TerraAdvisorDrawer
+        isOpen={isAdvisorOpen}
+        onClose={() => setIsAdvisorOpen(false)}
+        siteName={currentSite.name}
+        population={population}
+        areaAcres={areaAcres}
+        currentPlanCode={activePlan?.plan_code || 'PLAN_A'}
+      />
+
+      {/* Full Executive Feasibility Report Modal */}
+      <ReportExportModal
+        isOpen={isReportOpen}
+        onClose={() => setIsReportOpen(false)}
+        siteId={selectedSiteId}
+        population={population}
+        areaAcres={areaAcres}
+        activePlan={activePlan}
+      />
+
+      {/* ISRO Portal Credentials Modal */}
+      <CredentialsModal
+        isOpen={isCredentialsOpen}
+        onClose={() => setIsCredentialsOpen(false)}
+        onUpdated={() => getISROStatus()}
+      />
+
+      {/* Edit Zone Modal */}
+      <EditZoneModal
+        zone={editingZone}
+        onClose={() => setEditingZone(null)}
+        onSave={handleEditZoneSave}
       />
     </div>
   );
-}
-
-export default App;
+};
