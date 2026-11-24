@@ -264,7 +264,7 @@ export const App: React.FC = () => {
         />
 
         {/* Main Workspace Area */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden bg-[var(--bg-primary,#07111F)]">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden bg-[var(--bg-primary,#101113)]">
           {activeTab === 'landing' && (
             <LandingPage
               onStartPlanning={() => setActiveTab('master_plan')}

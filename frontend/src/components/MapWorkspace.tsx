@@ -839,34 +839,34 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
 
       {/* Floating Status Toast */}
       {toastMessage && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 border border-cyan-500/50 text-cyan-200 text-xs font-medium px-4 py-2 rounded-xl shadow-2xl backdrop-blur-md animate-in fade-in slide-in-from-top-3 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-cyan-400 shrink-0" />
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-[#18191B]/95 border border-[#282A2E] text-zinc-200 text-xs font-medium px-3.5 py-1.5 rounded-lg shadow-lg flex items-center gap-2">
+          <Info className="w-3.5 h-3.5 text-zinc-400 shrink-0" strokeWidth={1.5} />
           <span>{toastMessage}</span>
         </div>
       )}
 
       {/* LEFT PANEL (COLLAPSIBLE) */}
       <div
-        className={`absolute top-0 left-0 bottom-0 z-30 transition-all duration-300 ease-in-out flex ${
+        className={`absolute top-0 left-0 bottom-0 z-30 transition-all duration-150 ease-in-out flex ${
           leftPanelOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="w-80 md:w-96 h-full bg-[#0d1928]/95 border-r border-slate-700/70 backdrop-blur-xl shadow-2xl flex flex-col text-slate-100 overflow-hidden">
+        <div className="w-80 md:w-96 h-full bg-[#101113]/95 border-r border-[#282A2E] flex flex-col text-zinc-100 overflow-hidden">
           {/* Header */}
-          <div className="p-4 border-b border-slate-700/60 flex items-center justify-between bg-[#111f30]/80">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-600 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-600/30">
-                <MapIcon className="w-4 h-4 text-white" />
+          <div className="p-3.5 border-b border-[#282A2E] flex items-center justify-between bg-[#16171A]">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-md bg-[#242529] border border-[#2E3035] flex items-center justify-center text-zinc-300">
+                <MapIcon className="w-3.5 h-3.5" strokeWidth={1.5} />
               </div>
               <div>
-                <h2 className="text-sm font-bold text-slate-100 tracking-wide">GIS Spatial Workspace</h2>
-                <p className="text-[10px] text-cyan-400/90 font-mono">ISRO Space & Esri Imagery</p>
+                <h2 className="text-xs font-medium text-zinc-200">GIS spatial workspace</h2>
+                <p className="text-[10px] text-zinc-500 font-mono">ISRO & Cartographic layers</p>
               </div>
             </div>
             <button
               onClick={() => setLeftPanelOpen(false)}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition cursor-pointer"
-              title="Collapse Left Panel"
+              className="p-1 rounded-md text-zinc-400 hover:text-zinc-200 hover:bg-[#242529] transition cursor-pointer"
+              title="Collapse left panel"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -1264,19 +1264,19 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
             <span className="hidden sm:inline">Draw Land Boundary</span>
           </button>
         ) : (
-          <div className="flex items-center gap-2 bg-emerald-950/95 border border-emerald-500 text-emerald-200 text-xs px-3 py-1.5 rounded-xl backdrop-blur-md shadow-2xl animate-pulse">
-            <span className="font-mono">
-              Pts: {liveDrawingStats.pts} | {liveDrawingStats.acres} Ac ({liveDrawingStats.hectares} Ha)
+          <div className="flex items-center gap-2 bg-[#18191B] border border-[#282A2E] text-zinc-200 text-xs px-3 py-1.5 rounded-lg shadow-lg">
+            <span className="font-mono text-[11px] tabular-nums text-zinc-300">
+              Pts: {liveDrawingStats.pts} | {liveDrawingStats.acres} ac ({liveDrawingStats.hectares} ha)
             </span>
             <button
               onClick={finishDrawing}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1 rounded-lg transition cursor-pointer"
+              className="bg-zinc-100 hover:bg-white text-zinc-950 font-medium px-2 py-0.5 rounded text-xs transition cursor-pointer"
             >
               Complete
             </button>
             <button
               onClick={cancelDrawing}
-              className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded-lg transition cursor-pointer"
+              className="bg-[#242529] hover:bg-[#2C2E33] text-zinc-400 hover:text-zinc-200 px-2 py-0.5 rounded text-xs transition cursor-pointer border border-[#2E3035]"
             >
               Cancel
             </button>
@@ -1684,40 +1684,40 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
 
       {/* INTERACTIVE ZONE INSPECTOR CARD (MODAL / FLOAT) */}
       {selectedZone && (
-        <div className="absolute bottom-14 left-6 z-40 max-w-sm w-full bg-[#0d1928]/95 border border-cyan-500/50 rounded-2xl p-4 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-4 text-slate-100">
+        <div className="absolute bottom-14 left-6 z-40 max-w-sm w-full bg-[#18191B] border border-[#282A2E] rounded-xl p-4 shadow-xl text-zinc-100">
           <div className="flex items-start justify-between gap-2 mb-2">
             <div className="flex items-center gap-2">
               <span
-                className="w-4 h-4 rounded-md shadow-md shrink-0"
+                className="w-3.5 h-3.5 rounded-sm shrink-0"
                 style={{ backgroundColor: selectedZone.color }}
               ></span>
               <div>
-                <h3 className="text-sm font-bold text-slate-100 leading-tight">{selectedZone.name}</h3>
-                <span className="text-[10px] text-cyan-400 font-mono">{selectedZone.category}</span>
+                <h3 className="text-sm font-medium text-zinc-100 leading-tight">{selectedZone.name}</h3>
+                <span className="text-[10px] text-zinc-400 font-mono">{selectedZone.category}</span>
               </div>
             </div>
             <button
               onClick={() => setSelectedZone(null)}
-              className="text-slate-400 hover:text-white p-1 rounded-md hover:bg-slate-800 transition cursor-pointer"
+              className="text-zinc-400 hover:text-zinc-200 p-1 rounded-md hover:bg-[#242529] transition cursor-pointer"
             >
-              <X className="w-4 h-4" />
+              <X className="w-4 h-4" strokeWidth={1.5} />
             </button>
           </div>
 
-          <p className="text-xs text-slate-300 mb-3 leading-relaxed">{selectedZone.description}</p>
+          <p className="text-xs text-zinc-400 mb-3 leading-relaxed">{selectedZone.description}</p>
 
-          <div className="grid grid-cols-3 gap-2 bg-[#07111f]/90 rounded-xl p-2.5 text-center text-xs mb-3 border border-slate-800">
+          <div className="grid grid-cols-3 gap-2 bg-[#101113] rounded-lg p-2.5 text-center text-xs mb-3 border border-[#202225] font-mono">
             <div>
-              <span className="block text-[10px] text-slate-400 uppercase">Acreage</span>
-              <span className="font-bold text-cyan-400">{selectedZone.area_acres} ac</span>
+              <span className="block text-[10px] text-zinc-500">Acreage</span>
+              <span className="font-medium text-zinc-200 tabular-nums">{selectedZone.area_acres} ac</span>
             </div>
             <div>
-              <span className="block text-[10px] text-slate-400 uppercase">Share</span>
-              <span className="font-bold text-emerald-400">{selectedZone.area_percentage}%</span>
+              <span className="block text-[10px] text-zinc-500">Share</span>
+              <span className="font-medium text-emerald-400 tabular-nums">{selectedZone.area_percentage}%</span>
             </div>
             <div>
-              <span className="block text-[10px] text-slate-400 uppercase">FAR Ratio</span>
-              <span className="font-bold text-indigo-400">{selectedZone.far_ratio}</span>
+              <span className="block text-[10px] text-zinc-500">FAR</span>
+              <span className="font-medium text-zinc-200 tabular-nums">{selectedZone.far_ratio}</span>
             </div>
           </div>
 
@@ -1727,10 +1727,10 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
                 onEditZone(selectedZone);
                 setSelectedZone(null);
               }}
-              className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-semibold py-2 rounded-xl transition shadow-lg shadow-cyan-600/30 cursor-pointer flex items-center justify-center gap-1.5"
+              className="w-full bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-medium py-2 rounded-lg transition cursor-pointer flex items-center justify-center gap-1.5"
             >
-              <Edit3 className="w-3.5 h-3.5" />
-              <span>Edit Zone Parameters & Geometry</span>
+              <Edit3 className="w-3.5 h-3.5" strokeWidth={1.5} />
+              <span>Edit zone parameters</span>
             </button>
           </div>
         </div>

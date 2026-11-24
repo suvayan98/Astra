@@ -232,23 +232,17 @@ export const ISROHubView: React.FC<ISROHubViewProps> = ({ onOpenCredentialsModal
 
   return (
     <div className="max-w-[1700px] mx-auto p-4 md:p-6 space-y-6">
-      {/* Space-Intelligence Header Banner with Animated Satellite Orbit Graphic */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-[#060c18] via-[#0b172a] to-[#081224] border border-cyan-500/40 rounded-3xl p-6 md:p-8 shadow-2xl">
-        {/* Starfield & Glow Background Elements */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cyan-900/20 via-transparent to-transparent pointer-events-none"></div>
-        <div className="absolute -top-24 -left-24 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none"></div>
-
+      {/* Space-Intelligence Header Banner */}
+      <div className="relative overflow-hidden bg-[#18191B] border border-[#282A2E] rounded-xl p-5 md:p-6">
         <div className="relative z-10 flex flex-wrap items-center justify-between gap-6">
           <div className="max-w-3xl space-y-2">
-            <div className="flex items-center gap-2.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
-              <span className="w-2 h-2 -ml-3 rounded-full bg-emerald-500"></span>
-              <span className="text-[11px] font-bold tracking-widest uppercase bg-indigo-950 text-indigo-300 border border-indigo-700/80 px-2.5 py-0.5 rounded-full">
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              <span className="text-[11px] font-mono bg-[#101113] text-zinc-300 border border-[#202225] px-2 py-0.5 rounded">
                 ISRO / NRSC / SAC Integration Hub
               </span>
-              <span className="text-[11px] font-bold tracking-widest uppercase bg-cyan-950 text-cyan-300 border border-cyan-700/80 px-2.5 py-0.5 rounded-full">
-                ASTRA Special Feature
+              <span className="text-[11px] font-mono bg-[#101113] text-zinc-400 border border-[#202225] px-2 py-0.5 rounded">
+                Live OGC & STAC Gateway
               </span>
             </div>
 
@@ -322,18 +316,17 @@ export const ISROHubView: React.FC<ISROHubViewProps> = ({ onOpenCredentialsModal
           const isSelected = selectedPortal === portal.portal_id;
           const portalColor =
             portal.portal_id === 'bhoonidhi' ? 'cyan' :
-            portal.portal_id === 'bhuvan' ? 'indigo' :
-            portal.portal_id === 'mosdac' ? 'amber' : 'emerald';
+              portal.portal_id === 'bhuvan' ? 'indigo' :
+                portal.portal_id === 'mosdac' ? 'amber' : 'emerald';
 
           return (
             <div
               key={portal.portal_id}
               onClick={() => setSelectedPortal(portal.portal_id as any)}
-              className={`rounded-2xl p-5 border transition-all cursor-pointer flex flex-col justify-between shadow-xl relative overflow-hidden group ${
-                isSelected
+              className={`rounded-2xl p-5 border transition-all cursor-pointer flex flex-col justify-between shadow-xl relative overflow-hidden group ${isSelected
                   ? 'bg-slate-900 border-cyan-400/80 ring-2 ring-cyan-500/30 scale-[1.01]'
                   : 'bg-slate-900/70 border-slate-800 hover:border-slate-700 hover:bg-slate-900/90'
-              }`}
+                }`}
             >
               {/* Highlight top bar */}
               {isSelected && (
@@ -445,33 +438,29 @@ export const ISROHubView: React.FC<ISROHubViewProps> = ({ onOpenCredentialsModal
           <div className="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
             <button
               onClick={() => setSelectedPortal('bhoonidhi')}
-              className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${
-                selectedPortal === 'bhoonidhi' ? 'bg-cyan-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
-              }`}
+              className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${selectedPortal === 'bhoonidhi' ? 'bg-cyan-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
+                }`}
             >
               Bhoonidhi STAC
             </button>
             <button
               onClick={() => setSelectedPortal('bhuvan')}
-              className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${
-                selectedPortal === 'bhuvan' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
-              }`}
+              className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${selectedPortal === 'bhuvan' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
+                }`}
             >
               Bhuvan WMS
             </button>
             <button
               onClick={() => setSelectedPortal('mosdac')}
-              className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${
-                selectedPortal === 'mosdac' ? 'bg-amber-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
-              }`}
+              className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${selectedPortal === 'mosdac' ? 'bg-amber-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
+                }`}
             >
               MOSDAC Radar
             </button>
             <button
               onClick={() => setSelectedPortal('vedas')}
-              className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${
-                selectedPortal === 'vedas' ? 'bg-emerald-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
-              }`}
+              className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${selectedPortal === 'vedas' ? 'bg-emerald-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
+                }`}
             >
               VEDAS Vegetation
             </button>
@@ -708,11 +697,10 @@ export const ISROHubView: React.FC<ISROHubViewProps> = ({ onOpenCredentialsModal
                         <div
                           key={layer.id}
                           onClick={() => setBhuvanLayer(layer.id)}
-                          className={`p-3 rounded-xl border transition cursor-pointer text-xs ${
-                            isSelected
+                          className={`p-3 rounded-xl border transition cursor-pointer text-xs ${isSelected
                               ? 'bg-slate-900 border-indigo-500 ring-1 ring-indigo-500/30'
                               : 'bg-slate-950 border-slate-800/80 hover:border-slate-700'
-                          }`}
+                            }`}
                         >
                           <div className="flex items-center justify-between mb-1">
                             <span className="font-bold text-slate-200">{layer.name}</span>
@@ -1042,12 +1030,12 @@ export const ISROHubView: React.FC<ISROHubViewProps> = ({ onOpenCredentialsModal
                     <AreaChart data={vedasChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                       <defs>
                         <linearGradient id="colorNdvi" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#34d399" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#34d399" stopOpacity={0.0}/>
+                          <stop offset="5%" stopColor="#34d399" stopOpacity={0.8} />
+                          <stop offset="95%" stopColor="#34d399" stopOpacity={0.0} />
                         </linearGradient>
                         <linearGradient id="colorEvi" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#22d3ee" stopOpacity={0.0}/>
+                          <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.8} />
+                          <stop offset="95%" stopColor="#22d3ee" stopOpacity={0.0} />
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />

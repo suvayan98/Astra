@@ -98,24 +98,22 @@ export const CredentialsModal: React.FC<CredentialsModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in">
-      <div className="bg-slate-900 border border-indigo-500/50 rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl space-y-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+      <div className="bg-[#18191B] border border-[#282A2E] rounded-xl max-w-lg w-full p-6 shadow-xl space-y-5">
         {/* Modal Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-blue-600 to-cyan-500 p-0.5 flex items-center justify-center shadow-lg shadow-indigo-600/30">
-              <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-                <Cpu className="w-5 h-5 text-indigo-400" />
-              </div>
+        <div className="flex items-center justify-between pb-3.5 border-b border-[#282A2E]">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-md bg-[#242529] border border-[#2E3035] flex items-center justify-center text-zinc-300">
+              <Cpu className="w-4 h-4" strokeWidth={1.5} />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-                <span>Space Portal Credentials & Mode</span>
-                <span className="text-[10px] bg-indigo-950 text-indigo-300 border border-indigo-800 px-2 py-0.5 rounded-full font-semibold">
+              <h3 className="text-sm font-medium text-zinc-100 flex items-center gap-2">
+                <span>Space portal credentials & mode</span>
+                <span className="text-[10px] font-mono bg-[#101113] text-zinc-400 border border-[#202225] px-1.5 py-0.2 rounded">
                   ISRO Hub
                 </span>
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-zinc-400">
                 Configure live API tokens for Bhoonidhi, Bhuvan, MOSDAC, and VEDAS
               </p>
             </div>
@@ -285,18 +283,18 @@ export const CredentialsModal: React.FC<CredentialsModalProps> = ({
           )}
 
           {/* Form Submit & Cancel Actions */}
-          <div className="flex gap-3 pt-3">
+          <div className="flex gap-2.5 pt-2">
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 disabled:opacity-50 text-white font-bold py-2.5 rounded-xl transition shadow-lg shadow-indigo-600/30 cursor-pointer"
+              className="flex-1 bg-zinc-100 hover:bg-white disabled:opacity-50 text-zinc-950 font-medium py-2 rounded-lg text-xs transition cursor-pointer"
             >
-              {saving ? 'Saving...' : 'Save Configuration'}
+              {saving ? 'Saving...' : 'Save configuration'}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-5 py-2.5 rounded-xl transition cursor-pointer"
+              className="bg-[#242529] hover:bg-[#2C2E33] text-zinc-300 font-medium px-4 py-2 rounded-lg text-xs border border-[#2E3035] transition cursor-pointer"
             >
               Cancel
             </button>

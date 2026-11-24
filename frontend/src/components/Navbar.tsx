@@ -114,13 +114,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* ISRO Space Hub Status Button */}
           <button
             onClick={onOpenIsroModal}
-            className="flex items-center gap-2 bg-gradient-to-r from-indigo-950 to-blue-950 border border-indigo-700/60 hover:border-indigo-500 px-3 py-1.5 rounded-lg text-indigo-300 font-medium transition shadow-sm hover:shadow-indigo-500/10 cursor-pointer"
+            className="flex items-center gap-2 bg-[#18191B] border border-[#282A2E] hover:border-zinc-600 px-3 py-1.5 rounded-lg text-zinc-300 font-medium transition cursor-pointer"
             title="Configure ISRO Space Portals (Bhoonidhi, Bhuvan, MOSDAC, VEDAS)"
           >
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            <span className="w-2 h-2 -ml-4 rounded-full bg-emerald-500"></span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
             <span>ISRO Space Hub</span>
-            <span className="text-[10px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.2 rounded font-semibold border border-indigo-500/30">
+            <span className="text-[10px] bg-[#101113] text-zinc-400 px-1.5 py-0.2 rounded font-mono border border-[#202225]">
               Active
             </span>
           </button>

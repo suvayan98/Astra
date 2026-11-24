@@ -470,76 +470,76 @@ export const MasterPlanDesigner: React.FC<MasterPlanDesignerProps> = ({
       {/* =========================================================================
           SECTION 1: Header Banner with Toolbar & Initial Config Trigger
           ========================================================================= */}
-      <div className="bg-gradient-to-r from-[#0c182a] via-[#112239] to-[#0c182a] border border-cyan-500/30 rounded-2xl p-6 shadow-2xl flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-[#18191B] border border-[#282A2E] rounded-xl p-5 flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <span className="p-2 rounded-xl bg-cyan-950/80 border border-cyan-500/40 text-cyan-400">
-              <Sparkles className="w-6 h-6 animate-pulse" />
+            <span className="p-2 rounded-lg bg-[#242529] border border-[#2E3035] text-zinc-300">
+              <Compass className="w-5 h-5" strokeWidth={1.5} />
             </span>
             <div>
-              <h2 className="text-xl font-black text-slate-100 flex items-center gap-2">
-                <span>TerraCity Master-Plan Designer</span>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-semibold">
-                  AI Multi-Layout Synthesis
+              <h2 className="text-lg font-medium text-zinc-100 flex items-center gap-2">
+                <span>Master plan designer</span>
+                <span className="text-xs px-2 py-0.5 rounded bg-[#101113] text-zinc-400 border border-[#282A2E] font-mono">
+                  3 paradigms
                 </span>
               </h2>
-              <p className="text-xs text-slate-400">
-                Synthesizing demographic target of <strong className="text-cyan-400">{population.toLocaleString()} Inhabitants</strong> across{' '}
-                <strong className="text-emerald-400">{areaAcres} Gross Acres</strong> ({(areaAcres * 0.00404686).toFixed(2)} km²) with 12 canonical partitions.
+              <p className="text-xs text-zinc-400">
+                Demographic target: <strong className="text-zinc-200 font-mono">{population.toLocaleString()} residents</strong> across{' '}
+                <strong className="text-zinc-200 font-mono">{areaAcres} gross acres</strong> ({(areaAcres * 0.00404686).toFixed(2)} km²) with 12 canonical partitions.
               </p>
             </div>
           </div>
         </div>
 
         {/* Toolbar: Undo/Redo, Plan Config, Regenerate */}
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2">
           {/* Undo / Redo controls */}
-          <div className="flex items-center bg-slate-950/90 border border-slate-800 rounded-xl p-1">
+          <div className="flex items-center bg-[#101113] border border-[#282A2E] rounded-lg p-1">
             <button
               onClick={handleUndo}
               disabled={historyIdx <= 0}
-              className={`p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition ${
+              className={`p-1.5 rounded-md text-xs font-medium flex items-center gap-1 transition ${
                 historyIdx > 0
-                  ? 'text-slate-200 hover:bg-slate-800 cursor-pointer'
-                  : 'text-slate-600 cursor-not-allowed'
+                  ? 'text-zinc-200 hover:bg-[#242529] cursor-pointer'
+                  : 'text-zinc-600 cursor-not-allowed'
               }`}
-              title="Undo last modification (Ctrl+Z)"
+              title="Undo (Ctrl+Z)"
             >
-              <Undo2 className="w-4 h-4" />
-              <span className="text-[11px] font-bold">Undo</span>
+              <Undo2 className="w-3.5 h-3.5" strokeWidth={1.5} />
+              <span className="text-[11px]">Undo</span>
             </button>
-            <span className="w-px h-4 bg-slate-800 mx-1"></span>
+            <span className="w-px h-3.5 bg-[#282A2E] mx-1"></span>
             <button
               onClick={handleRedo}
               disabled={historyIdx >= history.length - 1}
-              className={`p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition ${
+              className={`p-1.5 rounded-md text-xs font-medium flex items-center gap-1 transition ${
                 historyIdx < history.length - 1
-                  ? 'text-slate-200 hover:bg-slate-800 cursor-pointer'
-                  : 'text-slate-600 cursor-not-allowed'
+                  ? 'text-zinc-200 hover:bg-[#242529] cursor-pointer'
+                  : 'text-zinc-600 cursor-not-allowed'
               }`}
-              title="Redo modification (Ctrl+Y)"
+              title="Redo (Ctrl+Y)"
             >
-              <Redo2 className="w-4 h-4" />
-              <span className="text-[11px] font-bold">Redo</span>
+              <Redo2 className="w-3.5 h-3.5" strokeWidth={1.5} />
+              <span className="text-[11px]">Redo</span>
             </button>
           </div>
 
           {/* Initial Configuration Modal Trigger */}
           <button
             onClick={() => setShowConfigModal(!showConfigModal)}
-            className="flex items-center gap-2 bg-slate-950 hover:bg-slate-800 border border-slate-700/80 text-cyan-300 font-semibold text-xs px-3.5 py-2 rounded-xl transition shadow-md cursor-pointer"
+            className="flex items-center gap-2 bg-[#18191B] hover:bg-[#222326] border border-[#282A2E] hover:border-zinc-600 text-zinc-200 font-medium text-xs px-3 py-1.5 rounded-lg transition cursor-pointer"
           >
-            <Settings className="w-4 h-4 text-cyan-400" />
-            <span>Plan Configuration & Constraints</span>
+            <Settings className="w-3.5 h-3.5 text-zinc-400" strokeWidth={1.5} />
+            <span>Plan parameters</span>
           </button>
 
           {/* Re-Generate Plans Button */}
           <button
             onClick={() => onRegeneratePlans(priorities)}
-            className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow-lg shadow-emerald-600/25 flex items-center gap-1.5 cursor-pointer"
+            className="bg-zinc-100 hover:bg-white text-zinc-950 font-medium text-xs px-3.5 py-1.5 rounded-lg transition flex items-center gap-1.5 cursor-pointer"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
-            <span>Re-Generate Master Plans</span>
+            <RefreshCw className="w-3.5 h-3.5" strokeWidth={1.5} />
+            <span>Re-generate master plans</span>
           </button>
         </div>
       </div>
@@ -761,104 +761,104 @@ export const MasterPlanDesigner: React.FC<MasterPlanDesignerProps> = ({
           ========================================================================= */}
       <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
         {/* Metric 1: Walkability */}
-        <div className="bg-[#0b1424] border border-cyan-500/30 rounded-2xl p-4 shadow-lg flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span className="font-semibold flex items-center gap-1">
-              <Compass className="w-3.5 h-3.5 text-cyan-400" /> Walkability
+        <div className="bg-[#18191B] border border-[#282A2E] rounded-xl p-3.5 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-zinc-400 text-xs">
+            <span className="font-medium flex items-center gap-1.5">
+              <Compass className="w-3.5 h-3.5 text-zinc-400" strokeWidth={1.5} /> Walkability
             </span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 font-bold">15-Min</span>
+            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[#101113] text-zinc-400 border border-[#202225]">15-min</span>
           </div>
           <div className="my-2">
-            <div className="text-2xl font-black text-cyan-400">{currentPlan.walkability_score}/100</div>
-            <div className="text-[10px] text-slate-400">TOD Pedestrian Network</div>
+            <div className="text-xl font-mono font-medium text-zinc-100 tabular-nums">{currentPlan.walkability_score}/100</div>
+            <div className="text-[10px] text-zinc-500 font-mono">Pedestrian network</div>
           </div>
-          <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-            <div className="bg-cyan-400 h-1.5 rounded-full" style={{ width: `${currentPlan.walkability_score}%` }}></div>
+          <div className="w-full bg-[#101113] rounded-full h-1 overflow-hidden">
+            <div className="bg-zinc-400 h-1 rounded-full" style={{ width: `${currentPlan.walkability_score}%` }}></div>
           </div>
         </div>
 
         {/* Metric 2: Green Space */}
-        <div className="bg-[#0b1424] border border-emerald-500/30 rounded-2xl p-4 shadow-lg flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span className="font-semibold flex items-center gap-1">
-              <Trees className="w-3.5 h-3.5 text-emerald-400" /> Green / Person
+        <div className="bg-[#18191B] border border-[#282A2E] rounded-xl p-3.5 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-zinc-400 text-xs">
+            <span className="font-medium flex items-center gap-1.5">
+              <Trees className="w-3.5 h-3.5 text-zinc-400" strokeWidth={1.5} /> Green space
             </span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 font-bold">&gt;9 m² WHO</span>
+            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[#101113] text-zinc-400 border border-[#202225]">&gt;9 m² WHO</span>
           </div>
           <div className="my-2">
-            <div className="text-2xl font-black text-emerald-400">{currentPlan.green_space_per_capita_sqm} m²</div>
-            <div className="text-[10px] text-slate-400">{greenPct}% Site Vegetated</div>
+            <div className="text-xl font-mono font-medium text-zinc-100 tabular-nums">{currentPlan.green_space_per_capita_sqm} m²</div>
+            <div className="text-[10px] text-zinc-500 font-mono">{greenPct}% site canopy</div>
           </div>
-          <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-            <div className="bg-emerald-400 h-1.5 rounded-full" style={{ width: `${Math.min(100, (currentPlan.green_space_per_capita_sqm / 40) * 100)}%` }}></div>
+          <div className="w-full bg-[#101113] rounded-full h-1 overflow-hidden">
+            <div className="bg-emerald-500 h-1 rounded-full" style={{ width: `${Math.min(100, (currentPlan.green_space_per_capita_sqm / 40) * 100)}%` }}></div>
           </div>
         </div>
 
         {/* Metric 3: Water Self-Sufficiency */}
-        <div className="bg-[#0b1424] border border-blue-500/30 rounded-2xl p-4 shadow-lg flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span className="font-semibold flex items-center gap-1">
-              <Droplets className="w-3.5 h-3.5 text-blue-400" /> Water Security
+        <div className="bg-[#18191B] border border-[#282A2E] rounded-xl p-3.5 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-zinc-400 text-xs">
+            <span className="font-medium flex items-center gap-1.5">
+              <Droplets className="w-3.5 h-3.5 text-zinc-400" strokeWidth={1.5} /> Water balance
             </span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-950 text-blue-300 font-bold">RWH+DEWATS</span>
+            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[#101113] text-zinc-400 border border-[#202225]">RWH+DEWATS</span>
           </div>
           <div className="my-2">
-            <div className="text-2xl font-black text-blue-400">{currentPlan.water_self_sufficiency_pct}%</div>
-            <div className="text-[10px] text-slate-400">Zero Groundwater Depletion</div>
+            <div className="text-xl font-mono font-medium text-zinc-100 tabular-nums">{currentPlan.water_self_sufficiency_pct}%</div>
+            <div className="text-[10px] text-zinc-500 font-mono">Aquifer equilibrium</div>
           </div>
-          <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-            <div className="bg-blue-400 h-1.5 rounded-full" style={{ width: `${currentPlan.water_self_sufficiency_pct}%` }}></div>
+          <div className="w-full bg-[#101113] rounded-full h-1 overflow-hidden">
+            <div className="bg-cyan-500 h-1 rounded-full" style={{ width: `${currentPlan.water_self_sufficiency_pct}%` }}></div>
           </div>
         </div>
 
         {/* Metric 4: RE Coverage */}
-        <div className="bg-[#0b1424] border border-amber-500/30 rounded-2xl p-4 shadow-lg flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span className="font-semibold flex items-center gap-1">
-              <SunMedium className="w-3.5 h-3.5 text-amber-400" /> RE Coverage
+        <div className="bg-[#18191B] border border-[#282A2E] rounded-xl p-3.5 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-zinc-400 text-xs">
+            <span className="font-medium flex items-center gap-1.5">
+              <SunMedium className="w-3.5 h-3.5 text-zinc-400" strokeWidth={1.5} /> Clean energy
             </span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 font-bold">Solar+BESS</span>
+            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[#101113] text-zinc-400 border border-[#202225]">Solar+BESS</span>
           </div>
           <div className="my-2">
-            <div className="text-2xl font-black text-amber-400">{currentPlan.renewable_energy_coverage_pct}%</div>
-            <div className="text-[10px] text-slate-400">Zero Net Carbon Energy</div>
+            <div className="text-xl font-mono font-medium text-zinc-100 tabular-nums">{currentPlan.renewable_energy_coverage_pct}%</div>
+            <div className="text-[10px] text-zinc-500 font-mono">Zero carbon target</div>
           </div>
-          <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-            <div className="bg-amber-400 h-1.5 rounded-full" style={{ width: `${currentPlan.renewable_energy_coverage_pct}%` }}></div>
+          <div className="w-full bg-[#101113] rounded-full h-1 overflow-hidden">
+            <div className="bg-amber-500 h-1 rounded-full" style={{ width: `${currentPlan.renewable_energy_coverage_pct}%` }}></div>
           </div>
         </div>
 
         {/* Metric 5: Public Transit Mode Share */}
-        <div className="bg-[#0b1424] border border-indigo-500/30 rounded-2xl p-4 shadow-lg flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span className="font-semibold flex items-center gap-1">
-              <Zap className="w-3.5 h-3.5 text-indigo-400" /> Transit Share
+        <div className="bg-[#18191B] border border-[#282A2E] rounded-xl p-3.5 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-zinc-400 text-xs">
+            <span className="font-medium flex items-center gap-1.5">
+              <Zap className="w-3.5 h-3.5 text-zinc-400" strokeWidth={1.5} /> Transit share
             </span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 font-bold">BRT+EV</span>
+            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[#101113] text-zinc-400 border border-[#202225]">BRT+EV</span>
           </div>
           <div className="my-2">
-            <div className="text-2xl font-black text-indigo-400">{currentPlan.public_transit_mode_share_target_pct}%</div>
-            <div className="text-[10px] text-slate-400">Non-Motorized + BRT</div>
+            <div className="text-xl font-mono font-medium text-zinc-100 tabular-nums">{currentPlan.public_transit_mode_share_target_pct}%</div>
+            <div className="text-[10px] text-zinc-500 font-mono">Non-motorized & BRT</div>
           </div>
-          <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-            <div className="bg-indigo-400 h-1.5 rounded-full" style={{ width: `${currentPlan.public_transit_mode_share_target_pct}%` }}></div>
+          <div className="w-full bg-[#101113] rounded-full h-1 overflow-hidden">
+            <div className="bg-zinc-400 h-1 rounded-full" style={{ width: `${currentPlan.public_transit_mode_share_target_pct}%` }}></div>
           </div>
         </div>
 
         {/* Metric 6: Capex in Crores */}
-        <div className="bg-[#0b1424] border border-violet-500/30 rounded-2xl p-4 shadow-lg flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span className="font-semibold flex items-center gap-1">
-              <Scale className="w-3.5 h-3.5 text-violet-400" /> Infra Capex
+        <div className="bg-[#18191B] border border-[#282A2E] rounded-xl p-3.5 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-zinc-400 text-xs">
+            <span className="font-medium flex items-center gap-1.5">
+              <Scale className="w-3.5 h-3.5 text-zinc-400" strokeWidth={1.5} /> Infra capex
             </span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-violet-950 text-violet-300 font-bold">Phase 1</span>
+            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[#101113] text-zinc-400 border border-[#202225]">Phase 1</span>
           </div>
           <div className="my-2">
-            <div className="text-2xl font-black text-violet-400">₹{currentPlan.estimated_infrastructure_capex_cr_inr} Cr</div>
-            <div className="text-[10px] text-slate-400">₹{(currentPlan.estimated_infrastructure_capex_cr_inr * 10000000 / population).toFixed(0)} / Capita</div>
+            <div className="text-xl font-mono font-medium text-zinc-100 tabular-nums">₹{currentPlan.estimated_infrastructure_capex_cr_inr} Cr</div>
+            <div className="text-[10px] text-zinc-500 font-mono">₹{(currentPlan.estimated_infrastructure_capex_cr_inr * 10000000 / population).toFixed(0)} / capita</div>
           </div>
-          <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-            <div className="bg-violet-400 h-1.5 rounded-full" style={{ width: `${Math.min(100, (currentPlan.estimated_infrastructure_capex_cr_inr / 800) * 100)}%` }}></div>
+          <div className="w-full bg-[#101113] rounded-full h-1 overflow-hidden">
+            <div className="bg-zinc-400 h-1 rounded-full" style={{ width: `${Math.min(100, (currentPlan.estimated_infrastructure_capex_cr_inr / 800) * 100)}%` }}></div>
           </div>
         </div>
       </div>
@@ -883,31 +883,31 @@ export const MasterPlanDesigner: React.FC<MasterPlanDesignerProps> = ({
                   onSelectPlan(harmonized);
                   pushHistory(harmonized);
                 }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer border ${
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer border ${
                   isSelected
-                    ? 'bg-gradient-to-r from-cyan-900/80 to-blue-900/80 border-cyan-400 text-cyan-200 shadow-md shadow-cyan-500/20'
-                    : 'bg-slate-900/70 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
+                    ? 'bg-[#242529] border-zinc-600 text-zinc-100 ring-1 ring-zinc-500/20'
+                    : 'bg-[#18191B] border-[#282A2E] text-zinc-400 hover:text-zinc-200 hover:border-zinc-700'
                 }`}
               >
                 <span
-                  className={`w-2.5 h-2.5 rounded-full ${
-                    p.plan_code === 'PLAN_A' ? 'bg-cyan-400' : p.plan_code === 'PLAN_B' ? 'bg-emerald-400' : 'bg-indigo-400'
+                  className={`w-2 h-2 rounded-full ${
+                    p.plan_code === 'PLAN_A' ? 'bg-cyan-400' : p.plan_code === 'PLAN_B' ? 'bg-emerald-400' : 'bg-amber-400'
                   }`}
                 />
                 <span>{p.name}</span>
-                {isSelected && <Check className="w-3.5 h-3.5 text-cyan-400" />}
+                {isSelected && <Check className="w-3.5 h-3.5 text-zinc-200" strokeWidth={1.5} />}
               </button>
             );
           })}
         </div>
 
         {/* View Mode Switcher */}
-        <div className="flex items-center bg-slate-950 border border-slate-800 rounded-xl p-1 text-xs">
+        <div className="flex items-center bg-[#101113] border border-[#282A2E] rounded-lg p-0.5 text-xs">
           {[
-            { id: 'overview', label: 'Layout Cards & Zones', icon: Layers },
-            { id: 'radar', label: 'Multi-Plan Radar Analysis', icon: BarChart3 },
-            { id: 'comparison', label: '3-Way Matrix Comparison', icon: Scale },
-            { id: 'density', label: 'Density & Trade-offs', icon: Info }
+            { id: 'overview', label: 'Cards & zones', icon: Layers },
+            { id: 'radar', label: 'Radar analysis', icon: BarChart3 },
+            { id: 'comparison', label: 'Matrix comparison', icon: Scale },
+            { id: 'density', label: 'Density evaluation', icon: Info }
           ].map((mode) => {
             const Icon = mode.icon;
             const active = activeTab === mode.id;
@@ -915,11 +915,11 @@ export const MasterPlanDesigner: React.FC<MasterPlanDesignerProps> = ({
               <button
                 key={mode.id}
                 onClick={() => setActiveTab(mode.id as any)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition cursor-pointer ${
-                  active ? 'bg-cyan-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md font-medium transition cursor-pointer ${
+                  active ? 'bg-[#242529] text-zinc-100 border border-zinc-700/60' : 'text-zinc-400 hover:text-zinc-200'
                 }`}
               >
-                <Icon className="w-3.5 h-3.5" />
+                <Icon className="w-3.5 h-3.5" strokeWidth={1.5} />
                 <span>{mode.label}</span>
               </button>
             );
@@ -1436,45 +1436,45 @@ export const MasterPlanDesigner: React.FC<MasterPlanDesignerProps> = ({
           {isCopilotMinimized ? (
             <button
               onClick={() => setIsCopilotMinimized(false)}
-              className="bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-bold p-3.5 rounded-full shadow-2xl flex items-center gap-2 cursor-pointer border-2 border-cyan-400/50"
+              className="bg-[#18191B] hover:bg-[#222326] text-zinc-200 border border-[#282A2E] hover:border-zinc-600 px-3.5 py-2 rounded-lg text-xs font-medium shadow-lg flex items-center gap-2 cursor-pointer transition-colors"
             >
-              <Bot className="w-5 h-5 animate-bounce" />
-              <span className="text-xs font-bold pr-1">TerraCity AI Copilot</span>
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <Bot className="w-4 h-4 text-zinc-400" strokeWidth={1.5} />
+              <span>TerraCity AI Copilot</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
             </button>
           ) : (
-            <div className="bg-[#0b1424] border-2 border-cyan-500/50 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100 max-h-[580px]">
+            <div className="bg-[#18191B] border border-[#282A2E] rounded-xl shadow-2xl flex flex-col overflow-hidden text-zinc-100 max-h-[580px]">
               {/* Copilot Header */}
-              <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+              <div className="bg-[#16171A] px-4 py-2.5 border-b border-[#282A2E] flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="p-1.5 rounded-lg bg-cyan-950 text-cyan-400 border border-cyan-800">
-                    <Bot className="w-4 h-4" />
+                  <span className="p-1 rounded-md bg-[#242529] text-zinc-300 border border-[#2E3035]">
+                    <Bot className="w-3.5 h-3.5" strokeWidth={1.5} />
                   </span>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-100 flex items-center gap-1.5">
-                      <span>TerraCity AI Copilot</span>
-                      <span className="text-[9px] px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-300 font-mono">
-                        Prompt Revisions
+                    <h4 className="text-xs font-medium text-zinc-200 flex items-center gap-1.5">
+                      <span>TerraCity Copilot</span>
+                      <span className="text-[9px] px-1 py-0.2 rounded bg-[#101113] text-zinc-400 font-mono border border-[#202225]">
+                        Revisions
                       </span>
                     </h4>
-                    <span className="text-[10px] text-slate-400">Interactive Master Plan Revisions</span>
+                    <span className="text-[10px] text-zinc-500 font-mono">Master plan revisions</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => setIsCopilotMinimized(true)}
-                    className="p-1 text-slate-400 hover:text-white rounded hover:bg-slate-800 cursor-pointer"
-                    title="Minimize Copilot"
+                    className="p-1 text-zinc-400 hover:text-zinc-200 rounded hover:bg-[#242529] cursor-pointer"
+                    title="Minimize"
                   >
-                    <ChevronDown className="w-4 h-4" />
+                    <ChevronDown className="w-3.5 h-3.5" strokeWidth={1.5} />
                   </button>
                   <button
                     onClick={() => setShowAICopilot(false)}
-                    className="p-1 text-slate-400 hover:text-white rounded hover:bg-slate-800 cursor-pointer"
+                    className="p-1 text-zinc-400 hover:text-zinc-200 rounded hover:bg-[#242529] cursor-pointer"
                     title="Close"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-3.5 h-3.5" strokeWidth={1.5} />
                   </button>
                 </div>
               </div>
@@ -1487,30 +1487,30 @@ export const MasterPlanDesigner: React.FC<MasterPlanDesignerProps> = ({
                     className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
                   >
                     <div
-                      className={`max-w-[90%] p-3 rounded-2xl ${
+                      className={`max-w-[90%] p-3 rounded-lg ${
                         msg.sender === 'user'
-                          ? 'bg-cyan-600 text-white rounded-tr-none'
-                          : 'bg-slate-900 border border-slate-800 text-slate-200 rounded-tl-none shadow-md space-y-2.5'
+                          ? 'bg-[#242529] text-zinc-100 border border-zinc-700/60'
+                          : 'bg-[#101113] border border-[#282A2E] text-zinc-300 space-y-2'
                       }`}
                     >
                       <p className="leading-relaxed whitespace-pre-wrap">{msg.text}</p>
 
                       {/* Structured Proposed Changes Preview Card */}
                       {msg.proposal && (
-                        <div className="bg-slate-950 border border-cyan-500/40 rounded-xl p-3 space-y-2 mt-2">
-                          <div className="flex items-center justify-between text-[11px] font-bold text-cyan-400 pb-1 border-b border-slate-800">
-                            <span>Proposed Spatial Allocation Changes:</span>
-                            <span className="text-emerald-400 font-mono">Ready to Apply</span>
+                        <div className="bg-[#18191B] border border-[#282A2E] rounded-lg p-3 space-y-2 mt-2">
+                          <div className="flex items-center justify-between text-[11px] font-medium text-zinc-200 pb-1 border-b border-[#282A2E]">
+                            <span>Spatial allocation adjustments:</span>
+                            <span className="text-zinc-400 font-mono text-[10px]">Ready</span>
                           </div>
 
                           <div className="space-y-1 text-[11px]">
                             {msg.proposal.changes.map((c, idx) => (
-                              <div key={idx} className="flex items-center justify-between bg-slate-900/60 px-2 py-1 rounded">
-                                <span className="font-semibold text-slate-300">{c.zoneName}:</span>
-                                <span className="font-mono">
-                                  {c.oldAcres} Ac <ArrowRight className="inline w-3 h-3 text-slate-500 mx-1" />
+                              <div key={idx} className="flex items-center justify-between bg-[#101113] px-2 py-1 rounded">
+                                <span className="font-medium text-zinc-300">{c.zoneName}:</span>
+                                <span className="font-mono text-zinc-400">
+                                  {c.oldAcres} ac <ArrowRight className="inline w-3 h-3 text-zinc-500 mx-1" />
                                   <strong className={c.deltaAcres > 0 ? 'text-emerald-400' : 'text-amber-400'}>
-                                    {c.newAcres} Ac ({c.deltaAcres > 0 ? `+${c.deltaAcres}` : c.deltaAcres} Ac)
+                                    {c.newAcres} ac ({c.deltaAcres > 0 ? `+${c.deltaAcres}` : c.deltaAcres} ac)
                                   </strong>
                                 </span>
                               </div>
@@ -1518,18 +1518,18 @@ export const MasterPlanDesigner: React.FC<MasterPlanDesignerProps> = ({
                           </div>
 
                           {/* Impact Delta Badges */}
-                          <div className="grid grid-cols-3 gap-1 pt-1 text-[10px] text-center">
-                            <div className="bg-slate-900 p-1 rounded">
-                              <span className="text-slate-400 block">Walkability</span>
-                              <strong className="text-cyan-400">+{msg.proposal.walkabilityDelta} pts</strong>
+                          <div className="grid grid-cols-3 gap-1 pt-1 text-[10px] text-center font-mono">
+                            <div className="bg-[#101113] p-1 rounded">
+                              <span className="text-zinc-500 block">Walkability</span>
+                              <strong className="text-zinc-200">+{msg.proposal.walkabilityDelta}</strong>
                             </div>
-                            <div className="bg-slate-900 p-1 rounded">
-                              <span className="text-slate-400 block">Green/Capita</span>
+                            <div className="bg-[#101113] p-1 rounded">
+                              <span className="text-zinc-500 block">Green/capita</span>
                               <strong className="text-emerald-400">+{msg.proposal.greenSpaceDelta} m²</strong>
                             </div>
-                            <div className="bg-slate-900 p-1 rounded">
-                              <span className="text-slate-400 block">Infra Capex</span>
-                              <strong className={msg.proposal.capexDelta <= 0 ? 'text-emerald-400' : 'text-indigo-400'}>
+                            <div className="bg-[#101113] p-1 rounded">
+                              <span className="text-zinc-500 block">Infra capex</span>
+                              <strong className={msg.proposal.capexDelta <= 0 ? 'text-emerald-400' : 'text-zinc-200'}>
                                 {msg.proposal.capexDelta > 0 ? `+₹${msg.proposal.capexDelta}Cr` : `-₹${Math.abs(msg.proposal.capexDelta)}Cr`}
                               </strong>
                             </div>
@@ -1538,22 +1538,22 @@ export const MasterPlanDesigner: React.FC<MasterPlanDesignerProps> = ({
                           {/* Action Button: Apply proposed changes */}
                           <button
                             onClick={() => handleApplyProposal(msg.proposal!)}
-                            className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-1.5 px-3 rounded-lg text-xs transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer mt-1"
+                            className="w-full bg-zinc-100 hover:bg-white text-zinc-950 font-medium py-1.5 px-3 rounded-lg text-xs transition flex items-center justify-center gap-1.5 cursor-pointer mt-1"
                           >
                             <Check className="w-3.5 h-3.5" />
-                            <span>Apply Revisions to Master Plan</span>
+                            <span>Apply revisions to master plan</span>
                           </button>
                         </div>
                       )}
                     </div>
-                    <span className="text-[9px] text-slate-500 px-1 mt-0.5">{msg.timestamp}</span>
+                    <span className="text-[9px] text-zinc-600 px-1 mt-0.5 font-mono">{msg.timestamp}</span>
                   </div>
                 ))}
 
                 {isAiThinking && (
-                  <div className="flex items-center gap-2 text-cyan-400 text-xs p-2">
-                    <div className="w-3 h-3 rounded-full bg-cyan-400 animate-ping"></div>
-                    <span className="italic font-medium">TerraCity Copilot is calculating spatial balance...</span>
+                  <div className="flex items-center gap-2 text-zinc-400 text-xs p-2">
+                    <span className="w-2 h-2 rounded-full bg-zinc-400" />
+                    <span className="font-mono text-[11px]">Computing spatial balance...</span>
                   </div>
                 )}
               </div>

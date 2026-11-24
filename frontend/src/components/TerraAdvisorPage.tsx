@@ -646,10 +646,10 @@ All my recommendations are cross-validated against **CPHEEO 2024**, **URDPFI 201
           {onOpenReport && (
             <button
               onClick={onOpenReport}
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs py-3 rounded-2xl shadow-lg shadow-emerald-600/20 transition cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 bg-zinc-100 hover:bg-white text-zinc-950 font-medium text-xs py-2.5 rounded-lg transition cursor-pointer"
             >
-              <FileText className="w-4 h-4" />
-              <span>Generate Executive Dossier</span>
+              <FileText className="w-4 h-4" strokeWidth={1.5} />
+              <span>Generate executive dossier</span>
             </button>
           )}
         </div>

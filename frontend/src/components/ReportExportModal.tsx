@@ -222,7 +222,8 @@ ${activePlan.zones.map((z: any) => `| ${z.name} | ${z.area_acres} | ${z.area_per
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-3 md:p-6 animate-in fade-in overflow-y-auto">
       {/* Print-specific style block to ensure pristine paper/PDF layout */}
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @media print {
           body * {
             visibility: hidden;
@@ -260,23 +261,21 @@ ${activePlan.zones.map((z: any) => `| ${z.name} | ${z.area_acres} | ${z.area_per
         }
       `}} />
 
-      <div className="bg-slate-900 border border-slate-700 rounded-3xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden relative">
+      <div className="bg-[#18191B] border border-[#282A2E] rounded-xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-xl overflow-hidden relative">
         {/* Modal Top Action Bar */}
-        <div className="p-4 md:px-6 border-b border-slate-800 bg-slate-950/90 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-cyan-600 p-0.5 flex items-center justify-center shadow-md shadow-emerald-500/20">
-              <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-                <FileText className="w-5 h-5 text-emerald-400" />
-              </div>
+        <div className="p-3.5 md:px-5 border-b border-[#282A2E] bg-[#16171A] flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-md bg-[#242529] border border-[#2E3035] flex items-center justify-center text-zinc-300">
+              <FileText className="w-4 h-4" strokeWidth={1.5} />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-slate-100 flex items-center gap-2">
-                <span>Executive Master Plan Dossier</span>
-                <span className="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded-full font-semibold">
-                  Official Audit Grade
+              <h2 className="text-xs font-medium text-zinc-100 flex items-center gap-2">
+                <span>Executive master plan dossier</span>
+                <span className="text-[10px] font-mono bg-[#101113] text-zinc-400 border border-[#202225] px-1.5 py-0.2 rounded">
+                  Audit grade
                 </span>
               </h2>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-zinc-400">
                 Multi-criteria feasibility, zoning geometry, water balance, and ISRO satellite audit trail
               </p>
             </div>

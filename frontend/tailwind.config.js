@@ -9,56 +9,46 @@ export default {
     extend: {
       colors: {
         terra: {
-          bg: '#07111F',
-          secondary: '#0D1928',
-          card: '#111F30',
-          elevated: '#17283A',
-          dark: '#07111F',
-          surface: '#111F30',
-          border: '#1E2D42',
-          muted: '#94A3B8',
-          cyan: '#22D3EE',
-          emerald: '#34D399',
-          blue: '#60A5FA',
-          amber: '#FBBF24',
-          coral: '#F87171',
-          rose: '#F87171',
-          indigo: '#818CF8'
+          bg: '#101113',
+          secondary: '#16171A',
+          card: '#1A1B1E',
+          elevated: '#242529',
+          dark: '#101113',
+          surface: '#1A1B1E',
+          border: '#282A2E',
+          borderSubtle: '#202225',
+          muted: '#71717A',
+          textSecondary: '#A1A1AA',
+          textPrimary: '#F4F4F5',
+          accent: '#06B6D4',
+          accentDark: '#0891B2',
+          cyan: '#06B6D4',
+          emerald: '#10B981',
+          blue: '#3B82F6',
+          amber: '#F59E0B',
+          coral: '#EF4444',
+          rose: '#F43F5E',
+          indigo: '#6366F1'
         },
         primary: {
-          DEFAULT: '#07111F',
-          50: '#F1F5F9',
-          100: '#E2E8F0',
-          200: '#CBD5E1',
-          300: '#94A3B8',
-          400: '#64748B',
-          500: '#334155',
-          600: '#1E293B',
-          700: '#17283A',
-          800: '#111F30',
-          900: '#0D1928',
-          950: '#07111F'
+          DEFAULT: '#101113',
+          50: '#FAFAFA',
+          100: '#F4F4F5',
+          200: '#E4E4E7',
+          300: '#D4D4D8',
+          400: '#A1A1AA',
+          500: '#71717A',
+          600: '#52525B',
+          700: '#3F3F46',
+          800: '#27272A',
+          900: '#18181B',
+          950: '#101113'
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
         display: ['"Space Grotesk"', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'monospace']
-      },
-      animation: {
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'orbit': 'orbit 20s linear infinite',
-        'float': 'float 6s ease-in-out infinite'
-      },
-      keyframes: {
-        orbit: {
-          '0%': { transform: 'rotate(0deg) translateX(120px) rotate(0deg)' },
-          '100%': { transform: 'rotate(360deg) translateX(120px) rotate(-360deg)' }
-        },
-        float: {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-10px)' }
-        }
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace']
       }
     },
   },
