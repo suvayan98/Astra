@@ -17,7 +17,7 @@ import {
   getFallbackISROStatus
 } from './fallbackData';
 
-const BASE_URL = '/api';
+const BASE_URL = (((import.meta as any).env?.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '') || '/api');
 const TIMEOUT_MS = 2500;
 
 async function fetchWithTimeout(url: string, options: RequestInit = {}): Promise<Response> {
